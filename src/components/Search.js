@@ -1,20 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { mockSearchResults } from '../constants/mock';
-import {XIcon, SearchIcon} from "@heroicons/react/solid"
+import {XIcon, SearchIcon} from "@heroicons/react/solid";
 import SearchResults from './SearchResults';
-
+import {searchSymbols} from "../api/stock-api";
 
 function Search() {
     const [input, setInput] = useState("");
-    const [bestMatches, setBestMatches] = useState(mockSearchResults.result);
+    const [bestMatches, setBestMatches] = useState([]);
 
     const clear = () => {
         setInput("")
         setBestMatches([])
     }
 
-    const updateBestMatches = () => {
-        setBestMatches(mockSearchResults.result);
+    const updateBestMatches = async () => {
+        // setBestMatches(mockSearchResults.result);
+        try{
+            if (input){
+                const SearchResults = await searchSymbols(input)
+                const result = SearchResults.result
+                setBestMatches(result)
+            }
+
+        }catch(error){
+        setBestMatches([])
+        console.log(error)
+        }
+       
     }
 
   return (

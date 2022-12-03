@@ -23,6 +23,7 @@ function Overview({ symbol, price, change, changePercent, currency }) {
           {change} <span>({changePercent}%)</span>
         </span>
       </div>
+      
     </Card>
   )
 }
