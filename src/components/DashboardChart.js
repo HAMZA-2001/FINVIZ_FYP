@@ -50,6 +50,7 @@ function DashboardChart() {
                 const {startTimestampUnix, endTimestampUnix} = getDataRange()
                 const resolution = chartConfig[filter].resolution
                 const result = await fetchHistoricalData(stockSymbol, resolution, startTimestampUnix, endTimestampUnix)
+                console.log(result)
                 setData(formatData(result))
             } catch (error) {
                 setData([])
@@ -104,6 +105,7 @@ function DashboardChart() {
           <YAxis domain={["dataMin", "dataMax"]} />
 
             </AreaChart>
+            
         </ResponsiveContainer>
 </ChartCard>        
 
