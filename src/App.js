@@ -11,6 +11,8 @@ import AuthenticationPage from './Authentication/AuthenticationPage';
 import { useState } from 'react';
 import { AuthProvider } from './Authentication/context/AuthContext';
 import PrivateRoute from './PrivateRoute';
+import UserProfile from './UserProfiling/UserProfile';
+import UserPortfolio from './Portfolio/UserPortfolio';
 
 function App() {
   const [stockSymbol, setStockSymbol] = useState("FB")
@@ -45,6 +47,24 @@ function App() {
           </div>
           </PrivateRoute>
           }/> 
+
+        <Route path="/userprofile" element={
+            <PrivateRoute>
+            <div className='app__header'>
+            <Header/>
+            <UserProfile/>
+          </div>
+          </PrivateRoute>
+          }/> 
+
+        <Route path="/portfolio" element={
+            <PrivateRoute>
+            <div className='app__header'>
+            <Header/>
+            <UserPortfolio/>
+          </div>
+          </PrivateRoute>
+          }/>
 
           <Route path="/" element={
             <div>
