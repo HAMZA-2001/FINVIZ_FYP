@@ -34,7 +34,7 @@ function Search() {
         <input
         type="text"
         value={input}
-        className="w-full px-4 py-2 focus:outline-none rounded-md "
+        className="w-full px-4 py-2 focus:outline-none rounded-md"
         placeholder="Search stock..."
         onChange={(event) => setInput(event.target.value)}
         onKeyPress={(event) => {

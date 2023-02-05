@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import { mockSearchResults } from './constants/mock'
 import { XIcon, SearchIcon } from '@heroicons/react/solid'
 import PortfolioSearchResults from './PortfolioSearchResults'
+import { searchSymbols } from '../api/stock-api'
 
 function StockSearch() {
 
     // for users query what company stocks are they looking for
     const [input, setInput] = useState("")
+    const [bestMatches, setBestMatches] = useState([])
 
     //state for the best matches returned from the api
     const clear = () => {
@@ -14,11 +16,20 @@ function StockSearch() {
         setBestMatches([])
     }
 
-    const updateBestMatches = () => {
-        setBestMatches(mockSearchResults.result)
+    const updateBestMatches = async () => {
+        try {
+            if (input) {
+                const SearchResults = await searchSymbols(input)
+                const result = SearchResults.result
+                setBestMatches(result)
+            }
+        } catch (error) {
+            setBestMatches([])
+            console.log(error)
+        }
     }
 
-    const [bestMatches, setBestMatches] = useState(mockSearchResults)
+
 
   return (
     <div className='flex items-center my-4 border-2 rounded-md relative z-50 w-96 bg-white border-neutral-200'>
