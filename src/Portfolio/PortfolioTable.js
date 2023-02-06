@@ -3,8 +3,11 @@ import { list } from 'postcss'
 import React, { useContext, useRef, useState }  from 'react'
 import { useEffect } from 'react'
 import { fetchQuote, fetchStockDetails } from '../api/stock-api'
+import UserForm from './constants/UserForm/UserForm'
+import Popup from './Popup'
 import PortfolioHeader from './PortfolioHeader'
 import StockPortfolioContext from './StockPortfolioContext'
+
 
 function PortfolioTable() {
     const {portfoliostockSymbol} = useContext(StockPortfolioContext)
@@ -24,6 +27,8 @@ function PortfolioTable() {
     
     let pfresults = {}
     const shouldLog = useRef(false)
+
+    const [openPopup, setOpenPopup] = useState(false)
 
     // function findStockDetails(listofstocks){
 
@@ -55,6 +60,13 @@ function PortfolioTable() {
     //           updatePfOverview(element)
     //     })
     //     }
+    function DeleteButton(event){
+        console.log(event.target.value)
+    }
+
+    function togglePopup(idx, e){
+        setOpenPopup(true)
+    }
     
 
 
@@ -249,11 +261,11 @@ function PortfolioTable() {
                             </td>
                             <td class="p-3 ">
                                 <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
-                                    <i class="material-icons-outlined text-base">Edit</i>
+                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index)}>Edit</i>
                                 </a>
-                                <a href="#" class="text-gray-400 hover:text-red-100  ml-2">
-                                    <i class="material-icons-round text-base">Delete</i>
-                                </a>
+                                <button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    <i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete</i>
+                                </button>
                             </td>
                         </tr>
 
@@ -266,6 +278,9 @@ function PortfolioTable() {
                 </table>
             </div>
         </div>
+        <Popup openPopup = {openPopup} setOpenPopup={setOpenPopup}>
+            <UserForm/>
+        </Popup>
     </div>
 
   )
