@@ -1,8 +1,9 @@
 import DateFnsUtils from '@date-io/date-fns'
 import { Button, Grid, makeStyles, TextField } from '@material-ui/core'
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import * as userService from "./userService"
+import StockPortfolioContext from '../../StockPortfolioContext'
 
 const useStyle = makeStyles(theme => ({
     root: {
@@ -20,9 +21,14 @@ const initialFValues = {
     date: new Date()
 }
 
-function UserForm() {
+function UserForm({idx}) {
     const [values, setValues] = useState(initialFValues)
     const classes = useStyle()
+    const [openPopup, setOpenPopup] = useState(false)
+    const [records, setrecords] = useState(userService.getAllUsers())
+    const [recordsforedite, setrecordsforedit] = useState(null)
+    const {Results, setResults} = useContext(StockPortfolioContext)
+    console.log(idx)
 
     const handleInputChange = e => {
         const {name, value} = e.target
@@ -35,16 +41,34 @@ function UserForm() {
 
     }
 
+    const resetForm = () => {
+        setValues(initialFValues)
+    }
+
     const convertToDefEventPara = (name, value) => ({
         target: {
             name, value
         }
     })
 
+    const addOrEdit = (user, restForm) => {
+        userService.insertUser(user)
+        restForm()
+        setOpenPopup(false)
+    }
+
     const handleSubmit = e => {
         console.log("clicked")
         e.preventDefault()
-        userService.insertUser(values)
+        userService.insertUser(values, idx)
+        userService.updateUser(values)
+        console.log(values)
+        // addOrEdit(values, resetForm)
+        resetForm()
+        setOpenPopup(false)
+        setrecords(userService.getAllUsers())
+        setResults(userService.getAllUsers())
+        console.log(records)
     }
 
   return (

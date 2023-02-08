@@ -1,5 +1,5 @@
 import { UsersIcon } from '@heroicons/react/solid'
-import { list } from 'postcss'
+import { list, Result } from 'postcss'
 import React, { useContext, useRef, useState }  from 'react'
 import { useEffect } from 'react'
 import { fetchQuote, fetchStockDetails } from '../api/stock-api'
@@ -7,10 +7,12 @@ import UserForm from './constants/UserForm/UserForm'
 import Popup from './Popup'
 import PortfolioHeader from './PortfolioHeader'
 import StockPortfolioContext from './StockPortfolioContext'
+import * as userService from "./constants/UserForm/userService"
+import EditStockContext from './EditStockContext'
 
 
 function PortfolioTable() {
-    const {portfoliostockSymbol} = useContext(StockPortfolioContext)
+    const {portfoliostockSymbol, Results} = useContext(StockPortfolioContext)
     //list of stock details
     const [stockDetails, setStockDetails] = useState([])
     //list of stock quotes
@@ -29,6 +31,12 @@ function PortfolioTable() {
     const shouldLog = useRef(false)
 
     const [openPopup, setOpenPopup] = useState(false)
+    const [records, setrecords] = useState(userService.getAllUsers())
+
+    const [recordsforedit, setrecordsforedit] = useState(null)
+    const [index, setindex] = useState(null) 
+
+    // const {Results} = useContext(StockPortfolioContextntext)
 
     // function findStockDetails(listofstocks){
 
@@ -65,12 +73,101 @@ function PortfolioTable() {
     }
 
     function togglePopup(idx, e){
+      
+        
+        setindex(idx)
+        //setrecordsforedit(records[idx])
         setOpenPopup(true)
+        setrecords(userService.getAllUsers())
+        console.log(records)
+        console.log("////////////////////////////////")
     }
     
+    // useEffect(() => {
+    //     console.log(records)
+       
+    //     console.log("hey")
+    //     // console.log(records)
+        // alldetails.map((item, idx) => {
+        //     console.log(records.length)
+        //     if (records!=[]){
+        //         records.map((recorditems, rec_idx)=>{
+        //               console.log(records[rec_idx].id) 
+        //               if(idx === recorditems.id){
+        //                 if(rec_idx+1<records.length){
+        //                     if(records[rec_idx].id!==records[rec_idx+1].id){
+        //                         alldetails[idx]["Shares"] = recorditems
+        //                         setalldetails(alldetails)
+        //                     }
+        //                 }else{
+        //                     console.log("length is qual")
+        //                 }
+        //               }else{
+        //                     console.log(item)
+        //                 }
+                
+                    
+        //         })
+              
+        //     }
+    //         // for(let i = 0; i < records.length; i++){
+    //         //     console.log(records[i])
+    //         //     if(parseInt(records[i].id) !== undefined){
+    //         //         console.log(records[i].id)
+    //         //         if (idx === parseInt(records[i].id)){
+    //         //             if(i+1<(records.length-1)){
+    //         //                 console.log("yessss")
+    //         //                 if(parseInt(records[i].id)!==parseInt(records[i+1].id)){
+    //         //                 setalldetails(alldetails[idx].push(records[i]))
+    //         //             }
+    //         //             }else{
+    //         //                 console.log("noooo")
+    //         //             }
+
+                        
+    //         //     }
+    //         //     }
+    //         // }
+    //         // if(records[idx].id !== null){
+    //         //     if (idx === records[idx].id){
+    //         //     if(records[idx].id!==records[idx+1].id)
+    //         //     setalldetails(alldetails[idx].push(records[idx]))
+    //         // }
+    //         // }
+
+    //     })
+    //     console.log(alldetails)
+    // }, [records])
+    
+    useEffect(() => {
+        console.log(Results)
+        // alldetails.map((item, idx) => {
+        //     console.log(Results.length)
+        //     if (Results!=[]){
+        //         Results.map((recorditems, rec_idx)=>{
+        //               console.log(records[rec_idx].id) 
+        //               if(idx === recorditems.id){
+        //                 if(rec_idx+1<Results.length){
+        //                     if(Results[rec_idx].id!==Results[rec_idx+1].id){
+        //                         alldetails[idx]["Shares"] = recorditems
+        //                         setalldetails(alldetails)
+        //                     }
+        //                 }else{
+        //                     console.log("length is qual")
+        //                 }
+        //               }else{
+        //                     console.log(item)
+        //                 }
+                
+                    
+        //         })
+              
+        //     }})
+    }, [Results])
 
 
     useEffect(() => {
+        console.log(records)
         if (shouldLog.current === true){
             const updateAllDetails = async () => {
                 let arr = []
@@ -152,6 +249,7 @@ function PortfolioTable() {
   return (
 
     <div className='relative overflow-hidden rounded-lg border border-gray-200 shadow-md w-full'>
+
         <div class="overflow-hidden rounded-lg border border-gray-200 shadow-md w-full">
             <div class="w-full border-collapse bg-white text-left text-sm text-gray-500">
                 <table class="table  text-gray-400 space-y-6 text-sm w-full">
@@ -218,7 +316,8 @@ function PortfolioTable() {
                         </tr>
                         
                         {console.log(alldetails)}
-                        { alldetails.slice(1).map((item, index) => {
+                       
+                        { alldetails.map((item, index) => {
                             return (
                                 <tr class="bg-gray-800">
                             <td class="p-3">
@@ -248,7 +347,7 @@ function PortfolioTable() {
                                 </div>
                             </td>
                             <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">12</span>
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].Shares}</span>
                             </td>
                             <td class="p-3">
                                 <span class="text-gray-50 rounded-md px-2">-</span>
@@ -278,9 +377,14 @@ function PortfolioTable() {
                 </table>
             </div>
         </div>
+
+        
         <Popup openPopup = {openPopup} setOpenPopup={setOpenPopup}>
-            <UserForm/>
+           
+            <UserForm idx = {index} setOpenPopup={setOpenPopup}/>
+            
         </Popup>
+
     </div>
 
   )

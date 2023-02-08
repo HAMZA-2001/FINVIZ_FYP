@@ -14,10 +14,11 @@ import PrivateRoute from './PrivateRoute';
 import UserProfile from './UserProfiling/UserProfile';
 import UserPortfolio from './Portfolio/UserPortfolio';
 import StockPortfolioContext from './Portfolio/StockPortfolioContext';
-
+import * as userService from './Portfolio/constants/UserForm/userService'
 function App() {
   const [stockSymbol, setStockSymbol] = useState("FB")
    const [portfoliostockSymbol, setportfoliostockSymbol] = useState("")
+   const [Results, setResults] = useState(userService.getAllUsers)
   return (
     <Router>
       <AuthProvider>
@@ -61,7 +62,7 @@ function App() {
 
         <Route path="/portfolio" element={
             <PrivateRoute>
-            <StockPortfolioContext.Provider value={{portfoliostockSymbol, setportfoliostockSymbol}}>
+            <StockPortfolioContext.Provider value={{portfoliostockSymbol, setportfoliostockSymbol, Results, setResults}}>
             <div className='app__header'>
               <Header/>
               <UserPortfolio/>

@@ -35,7 +35,7 @@ function App2() {
         const search_ticker = tickerData
 
 
-        d3.json("https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol="+search_ticker+"&apikey=R6DXIM881UZRQGUU").then(data => {
+        d3.json("https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY_ADJUSTED&symbol="+search_ticker+"&apikey=R6DXIM881UZRQGUU").then(data => {
             // prepare and clean data
             const filteredData = []
             const parseDate = d3.timeParse("%Y-%m-%d")
@@ -179,7 +179,7 @@ function App2() {
   return (
     <div className="App">
         <div className="input-group">
-            <input onChange={getTickerData.bind(this)} id = "input_ticker" type="search"  className="h-8 w-8 bg-indigo-600 rounded-md flex justify-center items-center m-1 p-2" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+            <input onChange={getTickerData.bind(this)} id = "input_ticker" type="search" className="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
             <button onClick={clickTickerData.bind(this)} id = "button_ticker" type="button" className="btn btn-outline-primary" >search</button>
         </div>
 

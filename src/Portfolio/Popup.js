@@ -15,6 +15,7 @@ function Popup(props) {
                     variant = "contained"
                     size = "medium"
                     type = "submit"
+                    onClick={() => {setOpenPopup(false)}}
                 >
                 X
                 </Button>
