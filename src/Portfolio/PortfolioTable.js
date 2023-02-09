@@ -145,7 +145,6 @@ function PortfolioTable() {
         //     console.log(Results.length)
         //     if (Results!=[]){
         //         Results.map((recorditems, rec_idx)=>{
-        //               console.log(records[rec_idx].id) 
         //               if(idx === recorditems.id){
         //                 if(rec_idx+1<Results.length){
         //                     if(Results[rec_idx].id!==Results[rec_idx+1].id){
@@ -162,7 +161,22 @@ function PortfolioTable() {
                     
         //         })
               
-        //     }})
+        //     }
+        //     else{
+        //         console.log("resutl is []")
+        //     }
+        
+        // })
+        for(let i=0; i<alldetails.length; i++){
+            for (let j=0; j< Results.length; j++){
+                console.log(j)
+                if(i === Results[j].id){
+                    alldetails[i]['Shares'] = Results[j]
+                    setalldetails(alldetails)
+                }
+            }
+        }
+        console.log(alldetails)
     }, [Results])
 
 

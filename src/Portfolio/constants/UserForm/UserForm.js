@@ -61,7 +61,7 @@ function UserForm({idx}) {
         console.log("clicked")
         e.preventDefault()
         userService.insertUser(values, idx)
-        userService.updateUser(values)
+        // userService.updateUser(values)
         console.log(values)
         // addOrEdit(values, resetForm)
         resetForm()
