@@ -1,6 +1,6 @@
 import { UsersIcon } from '@heroicons/react/solid'
 import { list, Result } from 'postcss'
-import React, { useContext, useRef, useState }  from 'react'
+import React, { useContext, useLayoutEffect, useRef, useState }  from 'react'
 import { useEffect } from 'react'
 import { fetchQuote, fetchStockDetails } from '../api/stock-api'
 import UserForm from './constants/UserForm/UserForm'
@@ -9,10 +9,14 @@ import PortfolioHeader from './PortfolioHeader'
 import StockPortfolioContext from './StockPortfolioContext'
 import * as userService from "./constants/UserForm/userService"
 import EditStockContext from './EditStockContext'
+import { useAuth } from '../Authentication/context/AuthContext'
+import { writeUserData } from '../firebase'
+import { getDatabase, onValue, push, ref, set } from 'firebase/database'
 
-
-function PortfolioTable() {
-    const {portfoliostockSymbol, Results} = useContext(StockPortfolioContext)
+let tickinDB = 0
+let mylistofStockDetail2 = []
+function PortfolioTable({len}) {
+    const {portfoliostockSymbol, setportfoliostockSymbol, Results} = useContext(StockPortfolioContext)
     //list of stock details
     const [stockDetails, setStockDetails] = useState([])
     //list of stock quotes
@@ -29,45 +33,191 @@ function PortfolioTable() {
     
     let pfresults = {}
     const shouldLog = useRef(false)
+    const shouldLog2 = useRef(false)
 
     const [openPopup, setOpenPopup] = useState(false)
     const [records, setrecords] = useState(userService.getAllUsers())
 
     const [recordsforedit, setrecordsforedit] = useState(null)
     const [index, setindex] = useState(null) 
+    const [tickerSymbols, setTickerSymbols] = useState()
 
-    // const {Results} = useContext(StockPortfolioContextntext)
+    const {currentUser} = useAuth()
+    console.log(currentUser.uid)
 
-    // function findStockDetails(listofstocks){
-
-    //     listofstocks.forEach(element => {
-    //         console.log(element)
-    //         const updatePfDetails = async (ticker) => {
-    //             try {
-    //                 const result = await fetchStockDetails(String(ticker))
-    //                 console.log(result)
+const [mylistofStockDetail, setmylistofStockDetail] = useState([])
 
 
-        
-    //             } catch (error) {
-    //                 console.log(error)
-    //             }
-    //           }
-    //           const updatePfOverview = async (ticker) => {
-    //             try {
-    //                 const result = await fetchQuote(ticker)
-    //                 console.log(result)
 
-        
-    //             } catch (error) {
-    //                 console.log(error)
-    //             }
-    //           }
+// Database stuff
+const [getdatabasetickers, setdatabasetickers] = useState([])
+const [refresh, setrefresh] = useState(0)
+const [arrlen, setarrlen] = useState(null)
+let dbtickarrlen = 0
+useEffect(()=>{
+   
+    setrefresh(refresh+1)
+},[])
 
-    //           updatePfDetails(element)
-    //           updatePfOverview(element)
+useEffect(()=>{
+    console.log(len)
+    if (refresh === 1) {
+        console.log(refresh)
+        console.log("hi")
+        let outerarr = []
+        onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+            console.log("inner")
+            Object.values(snapshot.val()).map((project) => {
+                console.log("outer")
+                const updateAllDetails = async () => {
+                  console.log(alldetails)
+                    let arr = []
+                    try {
+                        let result1 = await fetchStockDetails(project.portfoliostockSymbol)
+                        arr.push(result1)
+    
+                    } catch (error) {
+                        console.log(error)
+                    }
+    
+                    try {
+                        let result2 = await fetchQuote(project.portfoliostockSymbol)
+                        arr.push(result2)
+            
+                    } catch (error) {
+                        console.log(error)
+                    }
+    
+                    if (arr.length>0) {
+                        outerarr.push(arr)
+                        // setalldetails([...alldetails, arr])
+                     }
+
+                  }
+                  console.log(outerarr)
+                   updateAllDetails()
+
+                   
+
+                })     
+            })
+            // while(outerarr.length!==2){
+            //     console.log("waiting")
+            // }
+            console.log(outerarr.length)
+            setTimeout(() => {
+                setalldetails(outerarr)
+               }, 1000);
+    }
+    // console.log("use effect is here")
+    // const mydbtickerlist = []  
+    // onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {    
+    //     Object.values(snapshot.val()).map((project) => {
+    //             mydbtickerlist.push(project.portfoliostockSymbol)   
+    //         })   
+    //         console.log(snapshot)
     //     })
-    //     }
+        // setdatabasetickers(mydbtickerlist)
+        
+}, [refresh])
+
+// const mydbtickerlist = []  
+// onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {    
+//     Object.values(snapshot.val()).map((project) => {
+//             mydbtickerlist.push(project.portfoliostockSymbol)    
+//         })   
+//         console.log(snapshot)
+//     })
+// setdatabasetickers(mydbtickerlist)
+
+// useEffect(()=>{
+//     console.log("use effect is here")
+//     const mydbtickerlist = []  
+//     onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {    
+//         Object.values(snapshot.val()).map((project) => {
+//                 mydbtickerlist.push(project.portfoliostockSymbol)   
+//             })   
+//             console.log(snapshot)
+//         })
+//         // setdatabasetickers(mydbtickerlist)
+// }, [getdatabasetickers])
+
+
+
+// useEffect(()=>{
+//     console.log("useeffect is ran")
+//         if(shouldLog2.current === false){
+//             console.log(mylistofStockDetail2)
+//         let mylistofStockDetails = []
+//         let tickarray = []
+        
+        
+//         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+            
+//             Object.values(snapshot.val()).map((project) => {
+               
+//                 // const updateAllDetails = async () => {
+//                 //     let arr = []
+//                 //     try {
+//                 //         let result1 = await fetchStockDetails(project.portfoliostockSymbol)
+//                 //         arr.push(result1)
+    
+//                 //     } catch (error) {
+//                 //         console.log(error)
+//                 //     }
+    
+//                 //     try {
+//                 //         let result2 = await fetchQuote(project.portfoliostockSymbol)
+//                 //         arr.push(result2)
+            
+//                 //     } catch (error) {
+//                 //         console.log(error)
+//                 //     }
+    
+//                 //     if (arr.length>0) {
+//                 //         console.log(arr)
+//                 //         console.log(alldetails)
+                        
+//                 //         mylistofStockDetail2.push(arr)
+//                 //         // console.log(mylistofStockDetail2)
+//                 //         setmylistofStockDetail([...mylistofStockDetail, mylistofStockDetail2])
+//                 //     }
+//                 //   }
+//                 //   updateAllDetails()
+//                 //   console.log(project.portfoliostockSymbol)
+//                 // //   console.log(mylistofStockDetail2)
+//                 // tickarray.push(project.portfoliostockSymbol)
+
+//                 })
+                
+//             })
+
+//             console.log(mylistofStockDetail2)
+//         }else{
+//             shouldLog2.current = true
+//         }
+        
+
+// },[])
+
+// console.log(mylistofStockDetail2)
+// if(mylistofStockDetail2.length>0){
+//     console.log(mylistofStockDetail2)
+//     if(mylistofStockDetail2.length === 12){
+//         console.log(mylistofStockDetail2)
+//         setalldetails(mylistofStockDetail2)
+//     }
+// }
+
+// console.log(tickinDB)
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     function DeleteButton(event){
         console.log(event.target.value)
     }
@@ -138,6 +288,60 @@ function PortfolioTable() {
     //     })
     //     console.log(alldetails)
     // }, [records])
+
+
+    // const mylistofStocks = []
+    //     const db = getDatabase()
+    //     const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
+    //     onValue(reference, (snapshot) => {
+    //         const data = snapshot.val()
+    //         Object.values(data).map((project) => {
+                
+    //             //   updateAllDetails(pro)
+    //             console.log(project.portfoliostockSymbol)
+    //             // setProjects((projects) => [...projects, project]);
+    //             mylistofStocks.push(project.portfoliostockSymbol)
+    //             // setportfoliostockSymbol(project.portfoliostockSymbol)
+    //             // setTickerSymbols([...tickerSymbols, portfoliostockSymbol])
+                
+    //           });
+    //         //   setTickerSymbols(item)
+    //         console.log(mylistofStocks)  
+    //         mylistofStocks.map((item)=>{
+    //             // const updateAllDetails2 = async () => {
+    //             //     let arr = []
+    //             //     try {
+    //             //         let result1 = await fetchStockDetails(item)
+    //             //         arr.push(result1)
+            
+    //             //     } catch (error) {
+    //             //         console.log(error)
+    //             //     }
+            
+    //             //     try {
+    //             //         let result2 = await fetchQuote(item)
+    //             //         arr.push(result2)
+            
+    //             //     } catch (error) {
+    //             //         console.log(error)
+    //             //     }
+            
+    //             //     if (arr.length>0) {
+    //             //         setalldetails([...alldetails, arr])
+    //             //     }
+            
+    //             //     console.log()
+    //             //   }
+               
+                    
+    //         })
+    
+           
+    //     })
+
+        // useEffect(()=>{
+        //     console.log("changed")
+        // }, [tickerSymbols])
     
     useEffect(() => {
         console.log(Results)
@@ -176,11 +380,195 @@ function PortfolioTable() {
                 }
             }
         }
+        
         console.log(alldetails)
+        localStorage.clear()
     }, [Results])
+
+    const [projects, setProjects] = useState([]);
+
+    const [usersdata, setusersdata] = useState([])
+
+    async function pastData(item){
+        let arr = []
+        // let tic = (tic).toString()
+        try {
+            let result1 = await fetchStockDetails(item)
+            arr.push(result1)
+    
+        } catch (error) {
+            console.log(error)
+        }
+    
+        try {
+            let result2 = await fetchQuote(item)
+            arr.push(result2)
+    
+        } catch (error) {
+            console.log(error)
+        }
+    
+        if (arr.length>0) {
+            return arr
+
+        }
+    }
+
+    // useEffect(()=>{
+
+    //     async function pastData(item){
+    //         let arr = []
+    //         // let tic = (tic).toString()
+    //         try {
+    //             let result1 = await fetchStockDetails(item)
+    //             arr.push(result1)
+        
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+        
+    //         try {
+    //             let result2 = await fetchQuote(item)
+    //             arr.push(result2)
+        
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+        
+    //         if (arr.length>0) {
+    //             console.log("hey man")
+    //             console.log(arr)
+    //             setusersdata([...usersdata, arr])
+    //         }
+    //     }
+            
+        
+    //     const mylistofStocks = []
+    //     const db = getDatabase()
+    //     const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
+    //     onValue(reference, (snapshot) => {
+    //         const data = snapshot.val()
+    //         Object.values(data).map((project) => {
+                
+    //             //   updateAllDetails(pro)
+    //             console.log(project.portfoliostockSymbol)
+    //             setProjects((projects) => [...projects, project]);
+    //             mylistofStocks.push(project.portfoliostockSymbol)
+    //             // setportfoliostockSymbol(project.portfoliostockSymbol)
+    //             // setTickerSymbols([...tickerSymbols, portfoliostockSymbol])
+                
+    //           });
+    //         console.log(mylistofStocks)  
+    //         mylistofStocks.map((item)=>{
+    //                 pastData(item)
+    //         })
+    
+           
+    //     })
+    //     console.log(projects)
+
+    // },[])
+
+    // useEffect(()=>{
+    //     console.log("////////////////////////////////")
+    //     console.log(projects)
+    //     async function pastData(item){
+    //         let arr = []
+    //         // let tic = (tic).toString()
+    //         try {
+    //             let result1 = await fetchStockDetails(item)
+    //             arr.push(result1)
+        
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+        
+    //         try {
+    //             let result2 = await fetchQuote(item)
+    //             arr.push(result2)
+        
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+        
+    //         if (arr.length>0) {
+    //             console.log("hey man")
+    //             setalldetails([...alldetails, arr])
+    //         }
+    //     }
+
+    //     projects.forEach((item) => {
+    //         pastData(item.portfoliostockSymbol)
+    //     })
+    // },[projects])
+    // mylistofStocks.map((item)=>{
+    //     console.log(item)
+    //     const updateAllDetails1 = async (tic) => {
+    //         let arr = []
+    //         // let tic = (tic).toString()
+    //         try {
+    //             let result1 = await fetchStockDetails(tic)
+    //             arr.push(result1)
+
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+
+    //         try {
+    //             let result2 = await fetchQuote(tic)
+    //             arr.push(result2)
+    
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+
+    //         if (arr.length>0) {
+    //             console.log("hey man")
+    //             setProjects([...projects, arr])
+    //         }
+    //         console.log(arr)
+    //         console.log(projects)
+    //       }
+    //     //   setInterval(updateAllDetails1(item),1000)
+    //     updateAllDetails1(item)
+    // })
 
 
     useEffect(() => {
+
+        // projects.map((item  )=>{
+        //     console.log(item.portfoliostockSymbol)
+        // })
+
+            // const db = getDatabase()
+            // const reference = ref(db, 'users/' + currentUser.uid)
+            // set(reference, {
+            //     tickerList : tickerSymbols,
+            //     details : alldetails
+            //  })
+
+            const db = getDatabase()
+            const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
+            if(portfoliostockSymbol!==""){
+                const newPostRef = push(reference);
+                set(newPostRef, {
+                    portfoliostockSymbol
+                });
+            }
+
+        
+            // const db = getDatabase()
+            // const query = ref(db, 'users/' + currentUser.uid)
+            // return onValue(query, (snapshot) => {
+            //     const data = snapshot.val();
+            //     console.log(data)
+            //     if (snapshot.exists()) {
+            //       Object.values(data).map((project) => {
+            //         setProjects((projects) => [...projects, project]);
+            //       });
+            //     }
+            //   });
+
         console.log(records)
         if (shouldLog.current === true){
             const updateAllDetails = async () => {
@@ -256,14 +644,16 @@ function PortfolioTable() {
         console.log([...stockDetails])
  
        
-        
       
+    //    writeUserData(currentUser.uid, tickerSymbols, alldetails)
       }, [portfoliostockSymbol])
       
+        
   return (
-
+    
+    
     <div className='relative overflow-hidden rounded-lg border border-gray-200 shadow-md w-full'>
-
+        {console.log(alldetails)}
         <div class="overflow-hidden rounded-lg border border-gray-200 shadow-md w-full">
             <div class="w-full border-collapse bg-white text-left text-sm text-gray-500">
                 <table class="table  text-gray-400 space-y-6 text-sm w-full">
@@ -274,14 +664,15 @@ function PortfolioTable() {
                             <th class="p-3 text-left">Price</th>
                             <th class="p-3 text-left">Change %</th>
                             <th class="p-3 text-left">Shares</th>
-                            <th class="p-3 text-left">Cost</th>
+                            <th class="p-3 text-left">Share Value ($)</th>
+                            <th class="p-3 text-left">Total Cost/Transection ($)</th>
                             <th class="p-3 text-left">Today's Gain</th>
-                            <th class="p-3 text-left">Today's % Gain</th>
                             <th class="p-3 text-left">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="bg-gray-800">
+                    
+                        {/* <tr class="bg-gray-800">
                             <td class="p-3">
                                 <div class="flex align-items-center">
                                     <img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80" alt="unsplash image"/>
@@ -310,7 +701,7 @@ function PortfolioTable() {
                             <td class="p-3">
                                 <span class="text-gray-50 rounded-md px-2">12</span>
                             </td>
-                            <td class="p-3">
+                                                        <td class="p-3">
                                 <span class="text-gray-50 rounded-md px-2">-</span>
                             </td>
                             <td class="p-3">
@@ -319,6 +710,7 @@ function PortfolioTable() {
                             <td class="p-3">
                                 <span class="text-gray-50 rounded-md px-2">-</span>
                             </td>
+
                             <td class="p-3 ">
                                 <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
                                     <i class="material-icons-outlined text-base">Edit</i>
@@ -327,11 +719,12 @@ function PortfolioTable() {
                                     <i class="material-icons-round text-base">Delete</i>
                                 </a>
                             </td>
-                        </tr>
+                        </tr> */}
                         
                         {console.log(alldetails)}
                        
                         { alldetails.map((item, index) => {
+                            console.log(item)
                             return (
                                 <tr class="bg-gray-800">
                             <td class="p-3">
@@ -356,7 +749,7 @@ function PortfolioTable() {
                                 <div class="flex align-items-center">
                                     <div class="ml-3">
                                         <div class="">{(item[1].d)}</div>
-                                        <div class="text-gray-500">-0.15</div>
+                                        <div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}</div>
                                     </div>
                                 </div>
                             </td>
@@ -364,13 +757,18 @@ function PortfolioTable() {
                                 <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].Shares}</span>
                             </td>
                             <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">-</span>
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare}</span>
                             </td>
                             <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">-</span>
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare * item['Shares'].Shares}</span>
                             </td>
                             <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">-</span>
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}</div>
+                                        <div class="text-gray-500">{((item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}</div>
+                                    </div>
+                                </div>
                             </td>
                             <td class="p-3 ">
                                 <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
@@ -391,6 +789,8 @@ function PortfolioTable() {
                 </table>
             </div>
         </div>
+
+        {/*  */}
 
         
         <Popup openPopup = {openPopup} setOpenPopup={setOpenPopup}>
