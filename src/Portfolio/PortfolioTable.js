@@ -59,16 +59,80 @@ useEffect(()=>{
     setrefresh(refresh+1)
 },[])
 
+const [values, setValues] = useState([])
+const [count, setcount] = useState(null)
+
+
+
+
+// onValue(reference, (snapshot) => {
+        //     const data = snapshot.val()
+        //     Object.values(data).map((project) => {
+                
+        //         //   updateAllDetails(pro)
+        //         console.log(project.portfoliostockSymbol)
+        //         // setProjects((projects) => [...projects, project]);
+        //         mylistofStocks.push(project.portfoliostockSymbol)
+        //         // setportfoliostockSymbol(project.portfoliostockSymbol)
+        //         // setTickerSymbols([...tickerSymbols, portfoliostockSymbol])
+                
+        //       });
+        //     //   setTickerSymbols(item)
+        //     console.log(mylistofStocks)  
+        //     mylistofStocks.map((item)=>{
+        //         // const updateAllDetails2 = async () => {
+        //         //     let arr = []
+        //         //     try {
+        //         //         let result1 = await fetchStockDetails(item)
+        //         //         arr.push(result1)
+            
+        //         //     } catch (error) {
+        //         //         console.log(error)
+        //         //     }
+            
+        //         //     try {
+        //         //         let result2 = await fetchQuote(item)
+        //         //         arr.push(result2)
+            
+        //         //     } catch (error) {
+        //         //         console.log(error)
+        //         //     }
+            
+        //         //     if (arr.length>0) {
+        //         //         setalldetails([...alldetails, arr])
+        //         //     }
+            
+        //         //     console.log()
+        //         //   }
+               
+                    
+        //     })
+    
+           
+        // })
+
 useEffect(()=>{
-    console.log(len)
+ 
+    console.log(len) 
+    let mycount = 0
     if (refresh === 1) {
+        const collectionRef = ref(getDatabase(), 'users/' + currentUser.uid + '/tickers')
+        console.log(collectionRef)
+        console.log(collectionRef)
+        // const query = collectionRef.where('state', '==', 'CA');
+        // const snapshot = await query.count().get();
+        // console.log(snapshot.data().count);
+
         console.log(refresh)
         console.log("hi")
+       
         let outerarr = []
         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
             console.log("inner")
             Object.values(snapshot.val()).map((project) => {
+                mycount = mycount + 1
                 console.log("outer")
+                // setValues((values) => [...values, project])
                 const updateAllDetails = async () => {
                   console.log(alldetails)
                     let arr = []
@@ -91,6 +155,9 @@ useEffect(()=>{
                     if (arr.length>0) {
                         outerarr.push(arr)
                         // setalldetails([...alldetails, arr])
+                                    // setTimeout(() => {
+                                    //     setalldetails([...alldetails, arr])
+                                    // }, 1000);
                      }
 
                   }
@@ -105,9 +172,22 @@ useEffect(()=>{
             //     console.log("waiting")
             // }
             console.log(outerarr.length)
+            let i = 0
+            // while (i < 1001){
+            //     console.log(i)
+            //     i++
+            //     if (i === 1000){
+            //         console.log(outerarr)
+                   
+            //     }
+            // }
             setTimeout(() => {
+                console.log(outerarr)
+                console.log(outerarr.length)
+               console.log(alldetails)
+               setcount(mycount)
                 setalldetails(outerarr)
-               }, 1000);
+               }, 800);
     }
     // console.log("use effect is here")
     // const mydbtickerlist = []  
@@ -533,7 +613,7 @@ useEffect(()=>{
     //     updateAllDetails1(item)
     // })
 
-
+    const [clickedsearch, setclickSearch] = useState(false)
     useEffect(() => {
 
         // projects.map((item  )=>{
@@ -568,9 +648,11 @@ useEffect(()=>{
             //       });
             //     }
             //   });
-
-        console.log(records)
+      
+        console.log(alldetails)
+       
         if (shouldLog.current === true){
+            setclickSearch(true)
             const updateAllDetails = async () => {
                 let arr = []
                 try {
@@ -590,7 +672,24 @@ useEffect(()=>{
                 }
 
                 if (arr.length>0) {
-                    setalldetails([...alldetails, arr])
+                    console.log(arr)
+                    console.log(alldetails)
+                    // if(alldetails.length >= 1) {
+                    //     // alldetails.push()
+                    //     co
+                    //     setalldetails(current => [...current, arr])
+                    // }
+                    if (alldetails.length>0){
+                        console.log(alldetails)
+                        alldetails.map((items)=>{
+                            console.log(items)
+                        })   
+                    }
+                    setTimeout(
+                        () => setalldetails([...alldetails, arr]),
+                        2000
+                    )
+                    
                 }
 
               
@@ -602,6 +701,7 @@ useEffect(()=>{
                     const result2 = await fetchQuote(portfoliostockSymbol)
                     console.log(result)
                     settest1(result)
+                    
                     setStockDetails([...stockDetails, result])
                     // pfresults = result
                     // setresultname({"tic":result.ticker, "name":result.name})
@@ -627,6 +727,7 @@ useEffect(()=>{
               updatePfDetails() // details result
               updatePfOverview() // quote result
               updateAllDetails()
+            
               setstockList([...stockList, portfoliostockSymbol])
             //   itemsList.push({"symbol":portfoliostockSymbol, "data":pfresults})
         
@@ -722,11 +823,14 @@ useEffect(()=>{
                         </tr> */}
                         
                         {console.log(alldetails)}
+                        {console.log(count)}
+                        {console.log(clickedsearch)}
+                        {clickedsearch && console.log(count)}
                        
-                        { alldetails.map((item, index) => {
+                        { alldetails.slice(0, count).map((item, index) => {
                             console.log(item)
                             return (
-                                <tr class="bg-gray-800">
+                                <tr class="bg-gray-800" key={index}>
                             <td class="p-3">
                                 <div class="flex align-items-center">
                                     <img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80" alt="unsplash image"/>
@@ -784,6 +888,70 @@ useEffect(()=>{
                         }
                         ) 
                         }
+
+                        { alldetails.slice(2*count+1).map((item, index) => {
+                            console.log(item)
+                            return (
+                                <tr class="bg-gray-800" key={index}>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80" alt="unsplash image"/>
+                                    <div class="ml-3">
+                                        <div class="">{item[0].ticker}</div>
+                                        <div class="text-gray-500">{item[0].name}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{(item[1].pc)}</div> 
+                                        {/* {(quote[index].pc)} */}
+                                        <div class="text-gray-500">Post 258.20</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{(item[1].d)}</div>
+                                        <div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].Shares}</span>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare}</span>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare * item['Shares'].Shares}</span>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}</div>
+                                        <div class="text-gray-500">{((item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3 ">
+                                <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
+                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, ((index+1) + 2*count))}>Edit</i>
+                                </a>
+                                <button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    <i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete</i>
+                                </button>
+                            </td>
+                        </tr>
+
+                            )
+                        }
+                        ) 
+                        }
+
+
                         
                     </tbody>
                 </table>
