@@ -11,7 +11,7 @@ import * as userService from "./constants/UserForm/userService"
 import EditStockContext from './EditStockContext'
 import { useAuth } from '../Authentication/context/AuthContext'
 import { writeUserData } from '../firebase'
-import { getDatabase, onValue, push, ref, set } from 'firebase/database'
+import { getDatabase, onValue, push, ref, set, update } from 'firebase/database'
 
 let tickinDB = 0
 let mylistofStockDetail2 = []
@@ -63,54 +63,6 @@ const [values, setValues] = useState([])
 const [count, setcount] = useState(null)
 
 
-
-
-// onValue(reference, (snapshot) => {
-        //     const data = snapshot.val()
-        //     Object.values(data).map((project) => {
-                
-        //         //   updateAllDetails(pro)
-        //         console.log(project.portfoliostockSymbol)
-        //         // setProjects((projects) => [...projects, project]);
-        //         mylistofStocks.push(project.portfoliostockSymbol)
-        //         // setportfoliostockSymbol(project.portfoliostockSymbol)
-        //         // setTickerSymbols([...tickerSymbols, portfoliostockSymbol])
-                
-        //       });
-        //     //   setTickerSymbols(item)
-        //     console.log(mylistofStocks)  
-        //     mylistofStocks.map((item)=>{
-        //         // const updateAllDetails2 = async () => {
-        //         //     let arr = []
-        //         //     try {
-        //         //         let result1 = await fetchStockDetails(item)
-        //         //         arr.push(result1)
-            
-        //         //     } catch (error) {
-        //         //         console.log(error)
-        //         //     }
-            
-        //         //     try {
-        //         //         let result2 = await fetchQuote(item)
-        //         //         arr.push(result2)
-            
-        //         //     } catch (error) {
-        //         //         console.log(error)
-        //         //     }
-            
-        //         //     if (arr.length>0) {
-        //         //         setalldetails([...alldetails, arr])
-        //         //     }
-            
-        //         //     console.log()
-        //         //   }
-               
-                    
-        //     })
-    
-           
-        // })
-
 useEffect(()=>{
  
     console.log(len) 
@@ -129,9 +81,11 @@ useEffect(()=>{
         let outerarr = []
         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
             console.log("inner")
-            Object.values(snapshot.val()).map((project) => {
+            Object.values(snapshot.val()).map((project, i) => {
                 mycount = mycount + 1
                 console.log("outer")
+                console.log(project.details)
+              
                 // setValues((values) => [...values, project])
                 const updateAllDetails = async () => {
                   console.log(alldetails)
@@ -153,6 +107,8 @@ useEffect(()=>{
                     }
     
                     if (arr.length>0) {
+                        console.log(arr)
+                        // arr[i]['Shares'] = {Shares: project.details.Shares, AverageCostPerShare:project.details.AverageCostPerShare}
                         outerarr.push(arr)
                         // setalldetails([...alldetails, arr])
                                     // setTimeout(() => {
@@ -163,15 +119,18 @@ useEffect(()=>{
                   }
                   console.log(outerarr)
                    updateAllDetails()
+                   console.log(project.details)
+                   console.log(project.details.Shares, project.details.AverageCostPerShare )
+                //    outerarr[i]['Shares'] = {Shares: project.details.Shares, AverageCostPerShare:project.details.AverageCostPerShare} 
 
-                   
-
-                })     
+                })   
+                 
             })
             // while(outerarr.length!==2){
             //     console.log("waiting")
             // }
             console.log(outerarr.length)
+            
             let i = 0
             // while (i < 1001){
             //     console.log(i)
@@ -201,110 +160,23 @@ useEffect(()=>{
         
 }, [refresh])
 
-// const mydbtickerlist = []  
-// onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {    
-//     Object.values(snapshot.val()).map((project) => {
-//             mydbtickerlist.push(project.portfoliostockSymbol)    
-//         })   
-//         console.log(snapshot)
-//     })
-// setdatabasetickers(mydbtickerlist)
-
-// useEffect(()=>{
-//     console.log("use effect is here")
-//     const mydbtickerlist = []  
-//     onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {    
-//         Object.values(snapshot.val()).map((project) => {
-//                 mydbtickerlist.push(project.portfoliostockSymbol)   
-//             })   
-//             console.log(snapshot)
-//         })
-//         // setdatabasetickers(mydbtickerlist)
-// }, [getdatabasetickers])
-
-
-
-// useEffect(()=>{
-//     console.log("useeffect is ran")
-//         if(shouldLog2.current === false){
-//             console.log(mylistofStockDetail2)
-//         let mylistofStockDetails = []
-//         let tickarray = []
-        
-        
-//         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
-            
-//             Object.values(snapshot.val()).map((project) => {
-               
-//                 // const updateAllDetails = async () => {
-//                 //     let arr = []
-//                 //     try {
-//                 //         let result1 = await fetchStockDetails(project.portfoliostockSymbol)
-//                 //         arr.push(result1)
-    
-//                 //     } catch (error) {
-//                 //         console.log(error)
-//                 //     }
-    
-//                 //     try {
-//                 //         let result2 = await fetchQuote(project.portfoliostockSymbol)
-//                 //         arr.push(result2)
-            
-//                 //     } catch (error) {
-//                 //         console.log(error)
-//                 //     }
-    
-//                 //     if (arr.length>0) {
-//                 //         console.log(arr)
-//                 //         console.log(alldetails)
-                        
-//                 //         mylistofStockDetail2.push(arr)
-//                 //         // console.log(mylistofStockDetail2)
-//                 //         setmylistofStockDetail([...mylistofStockDetail, mylistofStockDetail2])
-//                 //     }
-//                 //   }
-//                 //   updateAllDetails()
-//                 //   console.log(project.portfoliostockSymbol)
-//                 // //   console.log(mylistofStockDetail2)
-//                 // tickarray.push(project.portfoliostockSymbol)
-
-//                 })
-                
-//             })
-
-//             console.log(mylistofStockDetail2)
-//         }else{
-//             shouldLog2.current = true
-//         }
-        
-
-// },[])
-
-// console.log(mylistofStockDetail2)
-// if(mylistofStockDetail2.length>0){
-//     console.log(mylistofStockDetail2)
-//     if(mylistofStockDetail2.length === 12){
-//         console.log(mylistofStockDetail2)
-//         setalldetails(mylistofStockDetail2)
-//     }
-// }
-
-// console.log(tickinDB)
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    // let currentshares = 0
+    // let current_sv = 0
+    const [currentshares, setcurrentshares] = useState(null)
+    const [current_sv, setcurrent_sv] = useState(null)
 
     function DeleteButton(event){
         console.log(event.target.value)
     }
 
-    function togglePopup(idx, e){
-      
-        
+    function togglePopup(idx, shares, shares_value, e){
+        // currentshares = shares
+        // current_sv = shares_value
+        setcurrentshares(shares)
+        setcurrent_sv(shares_value)
         setindex(idx)
         //setrecordsforedit(records[idx])
         setOpenPopup(true)
@@ -312,154 +184,83 @@ useEffect(()=>{
         console.log(records)
         console.log("////////////////////////////////")
     }
-    
-    // useEffect(() => {
-    //     console.log(records)
-       
-    //     console.log("hey")
-    //     // console.log(records)
-        // alldetails.map((item, idx) => {
-        //     console.log(records.length)
-        //     if (records!=[]){
-        //         records.map((recorditems, rec_idx)=>{
-        //               console.log(records[rec_idx].id) 
-        //               if(idx === recorditems.id){
-        //                 if(rec_idx+1<records.length){
-        //                     if(records[rec_idx].id!==records[rec_idx+1].id){
-        //                         alldetails[idx]["Shares"] = recorditems
-        //                         setalldetails(alldetails)
-        //                     }
-        //                 }else{
-        //                     console.log("length is qual")
-        //                 }
-        //               }else{
-        //                     console.log(item)
-        //                 }
-                
+
+    let updatedDetailsFlag = true
+    function storeDetailsinDatabase(tickersymbol, shares, acpershare, date, results){
+        console.log(tickersymbol, shares, acpershare, date)
+        console.log(currentshares, current_sv)
+        onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+            console.log(snapshot)
+            console.log(snapshot.val())
+            const listkeys = Object.keys(snapshot.val())
+            Object.values(snapshot.val()).map((project, item) => {
+                    console.log(project)
+                    console.log(Object.keys(snapshot.val()))
+                    if ((project.portfoliostockSymbol === tickersymbol) && (project.details === '')){
+                        console.log(project.details)
+                        console.log(project.portfoliostockSymbol)
+                        const db = getDatabase()
+                        const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
+                            // const newPostRef = push(reference);
+                            console.log(updatedDetailsFlag)
+                            if(updatedDetailsFlag === true){
+                                updatedDetailsFlag = false
+                                console.log(reference)
+                                update(reference,{
+                                    details: results,
+                                });
+                                
+                            }
+                    }
                     
-        //         })
-              
-        //     }
-    //         // for(let i = 0; i < records.length; i++){
-    //         //     console.log(records[i])
-    //         //     if(parseInt(records[i].id) !== undefined){
-    //         //         console.log(records[i].id)
-    //         //         if (idx === parseInt(records[i].id)){
-    //         //             if(i+1<(records.length-1)){
-    //         //                 console.log("yessss")
-    //         //                 if(parseInt(records[i].id)!==parseInt(records[i+1].id)){
-    //         //                 setalldetails(alldetails[idx].push(records[i]))
-    //         //             }
-    //         //             }else{
-    //         //                 console.log("noooo")
-    //         //             }
-
-                        
-    //         //     }
-    //         //     }
-    //         // }
-    //         // if(records[idx].id !== null){
-    //         //     if (idx === records[idx].id){
-    //         //     if(records[idx].id!==records[idx+1].id)
-    //         //     setalldetails(alldetails[idx].push(records[idx]))
-    //         // }
-    //         // }
-
-    //     })
-    //     console.log(alldetails)
-    // }, [records])
-
-
-    // const mylistofStocks = []
-    //     const db = getDatabase()
-    //     const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
-    //     onValue(reference, (snapshot) => {
-    //         const data = snapshot.val()
-    //         Object.values(data).map((project) => {
-                
-    //             //   updateAllDetails(pro)
-    //             console.log(project.portfoliostockSymbol)
-    //             // setProjects((projects) => [...projects, project]);
-    //             mylistofStocks.push(project.portfoliostockSymbol)
-    //             // setportfoliostockSymbol(project.portfoliostockSymbol)
-    //             // setTickerSymbols([...tickerSymbols, portfoliostockSymbol])
-                
-    //           });
-    //         //   setTickerSymbols(item)
-    //         console.log(mylistofStocks)  
-    //         mylistofStocks.map((item)=>{
-    //             // const updateAllDetails2 = async () => {
-    //             //     let arr = []
-    //             //     try {
-    //             //         let result1 = await fetchStockDetails(item)
-    //             //         arr.push(result1)
-            
-    //             //     } catch (error) {
-    //             //         console.log(error)
-    //             //     }
-            
-    //             //     try {
-    //             //         let result2 = await fetchQuote(item)
-    //             //         arr.push(result2)
-            
-    //             //     } catch (error) {
-    //             //         console.log(error)
-    //             //     }
-            
-    //             //     if (arr.length>0) {
-    //             //         setalldetails([...alldetails, arr])
-    //             //     }
-            
-    //             //     console.log()
-    //             //   }
-               
+                    if ((project.portfoliostockSymbol === tickersymbol) && (project.details.Shares === currentshares) && (project.details.AverageCostPerShare === current_sv)) {
+                        console.log('dfsfsfasfdsf')
+                        const db = getDatabase()
+                        const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
+                        if(updatedDetailsFlag === true){
+                            updatedDetailsFlag = false
+                            console.log(reference)
+                            update(reference,{
+                                details: results,     
+                            });
+                            
+                        }
+                    } else {
+                        console.log("not matched")
+                    }
                     
-    //         })
+                })     
+            })
+        // const db = getDatabase()
+        // const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
+        // if(portfoliostockSymbol!==""){
+        //     const newPostRef = push(reference);
+        //     set(newPostRef, {
+        //         portfoliostockSymbol,
+                
+        //     });
+        // }
+    }
     
-           
-    //     })
 
-        // useEffect(()=>{
-        //     console.log("changed")
-        // }, [tickerSymbols])
-    
     useEffect(() => {
         console.log(Results)
-        // alldetails.map((item, idx) => {
-        //     console.log(Results.length)
-        //     if (Results!=[]){
-        //         Results.map((recorditems, rec_idx)=>{
-        //               if(idx === recorditems.id){
-        //                 if(rec_idx+1<Results.length){
-        //                     if(Results[rec_idx].id!==Results[rec_idx+1].id){
-        //                         alldetails[idx]["Shares"] = recorditems
-        //                         setalldetails(alldetails)
-        //                     }
-        //                 }else{
-        //                     console.log("length is qual")
-        //                 }
-        //               }else{
-        //                     console.log(item)
-        //                 }
-                
-                    
-        //         })
-              
-        //     }
-        //     else{
-        //         console.log("resutl is []")
-        //     }
-        
-        // })
+        console.log(alldetails)
         for(let i=0; i<alldetails.length; i++){
             for (let j=0; j< Results.length; j++){
                 console.log(j)
                 if(i === Results[j].id){
+                    console.log(alldetails[i][0].ticker)
                     alldetails[i]['Shares'] = Results[j]
                     setalldetails(alldetails)
+                    if(Results.length > 0){
+                        storeDetailsinDatabase(alldetails[i][0].ticker, Results[0].Shares, Results[0].AverageCostPerShare, Results[0].date, Results[0])
+                    }
                 }
             }
         }
+        console.log(Results)
+
         
         console.log(alldetails)
         localStorage.clear()
@@ -494,124 +295,7 @@ useEffect(()=>{
         }
     }
 
-    // useEffect(()=>{
-
-    //     async function pastData(item){
-    //         let arr = []
-    //         // let tic = (tic).toString()
-    //         try {
-    //             let result1 = await fetchStockDetails(item)
-    //             arr.push(result1)
-        
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-        
-    //         try {
-    //             let result2 = await fetchQuote(item)
-    //             arr.push(result2)
-        
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-        
-    //         if (arr.length>0) {
-    //             console.log("hey man")
-    //             console.log(arr)
-    //             setusersdata([...usersdata, arr])
-    //         }
-    //     }
-            
-        
-    //     const mylistofStocks = []
-    //     const db = getDatabase()
-    //     const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
-    //     onValue(reference, (snapshot) => {
-    //         const data = snapshot.val()
-    //         Object.values(data).map((project) => {
-                
-    //             //   updateAllDetails(pro)
-    //             console.log(project.portfoliostockSymbol)
-    //             setProjects((projects) => [...projects, project]);
-    //             mylistofStocks.push(project.portfoliostockSymbol)
-    //             // setportfoliostockSymbol(project.portfoliostockSymbol)
-    //             // setTickerSymbols([...tickerSymbols, portfoliostockSymbol])
-                
-    //           });
-    //         console.log(mylistofStocks)  
-    //         mylistofStocks.map((item)=>{
-    //                 pastData(item)
-    //         })
-    
-           
-    //     })
-    //     console.log(projects)
-
-    // },[])
-
-    // useEffect(()=>{
-    //     console.log("////////////////////////////////")
-    //     console.log(projects)
-    //     async function pastData(item){
-    //         let arr = []
-    //         // let tic = (tic).toString()
-    //         try {
-    //             let result1 = await fetchStockDetails(item)
-    //             arr.push(result1)
-        
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-        
-    //         try {
-    //             let result2 = await fetchQuote(item)
-    //             arr.push(result2)
-        
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-        
-    //         if (arr.length>0) {
-    //             console.log("hey man")
-    //             setalldetails([...alldetails, arr])
-    //         }
-    //     }
-
-    //     projects.forEach((item) => {
-    //         pastData(item.portfoliostockSymbol)
-    //     })
-    // },[projects])
-    // mylistofStocks.map((item)=>{
-    //     console.log(item)
-    //     const updateAllDetails1 = async (tic) => {
-    //         let arr = []
-    //         // let tic = (tic).toString()
-    //         try {
-    //             let result1 = await fetchStockDetails(tic)
-    //             arr.push(result1)
-
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-
-    //         try {
-    //             let result2 = await fetchQuote(tic)
-    //             arr.push(result2)
-    
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-
-    //         if (arr.length>0) {
-    //             console.log("hey man")
-    //             setProjects([...projects, arr])
-    //         }
-    //         console.log(arr)
-    //         console.log(projects)
-    //       }
-    //     //   setInterval(updateAllDetails1(item),1000)
-    //     updateAllDetails1(item)
-    // })
+ 
 
     const [clickedsearch, setclickSearch] = useState(false)
     useEffect(() => {
@@ -632,7 +316,9 @@ useEffect(()=>{
             if(portfoliostockSymbol!==""){
                 const newPostRef = push(reference);
                 set(newPostRef, {
-                    portfoliostockSymbol
+                    portfoliostockSymbol,
+                    details: ""
+                    
                 });
             }
 
@@ -876,7 +562,7 @@ useEffect(()=>{
                             </td>
                             <td class="p-3 ">
                                 <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
-                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index)}>Edit</i>
+                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index, item['Shares'] && item['Shares'].Shares, item['Shares'] && item['Shares'].AverageCostPerShare)}>Edit</i>
                                 </a>
                                 <button href="#" class="text-gray-400 hover:text-red-100  ml-2">
                                     <i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete</i>
@@ -938,7 +624,7 @@ useEffect(()=>{
                             </td>
                             <td class="p-3 ">
                                 <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
-                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, ((index+1) + 2*count))}>Edit</i>
+                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, ((index+1) + 2*count), item['Shares'] && item['Shares'].Shares, item['Shares'] && item['Shares'].AverageCostPerShare)}>Edit</i>
                                 </a>
                                 <button href="#" class="text-gray-400 hover:text-red-100  ml-2">
                                     <i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete</i>
