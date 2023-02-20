@@ -12,6 +12,7 @@ import EditStockContext from './EditStockContext'
 import { useAuth } from '../Authentication/context/AuthContext'
 import { writeUserData } from '../firebase'
 import { getDatabase, onValue, push, ref, set, update } from 'firebase/database'
+// import {onSnapshot} from 'firebase/firestore'
 
 let tickinDB = 0
 let mylistofStockDetail2 = []
@@ -54,8 +55,18 @@ const [getdatabasetickers, setdatabasetickers] = useState([])
 const [refresh, setrefresh] = useState(0)
 const [arrlen, setarrlen] = useState(null)
 let dbtickarrlen = 0
+const [idList, setidstate] = useState([])
 useEffect(()=>{
-   
+     onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+                // setidstate(Object.keys(snapshot.val()))
+                let firebaseContents = []
+                Object.values(snapshot.val()).map((project, item) => {  
+                    //  fireba
+                        console.log(project)
+                    })     
+                })
+
+
     setrefresh(refresh+1)
 },[])
 
@@ -68,6 +79,7 @@ useEffect(()=>{
     console.log(len) 
     let mycount = 0
     if (refresh === 1) {
+        console.log(idList)
         const collectionRef = ref(getDatabase(), 'users/' + currentUser.uid + '/tickers')
         console.log(collectionRef)
         console.log(collectionRef)
@@ -119,18 +131,14 @@ useEffect(()=>{
                   }
                   console.log(outerarr)
                    updateAllDetails()
-                   console.log(project.details)
-                   console.log(project.details.Shares, project.details.AverageCostPerShare )
-                //    outerarr[i]['Shares'] = {Shares: project.details.Shares, AverageCostPerShare:project.details.AverageCostPerShare} 
 
-                })   
-                 
+                   
+
+                })     
             })
-            // while(outerarr.length!==2){
-            //     console.log("waiting")
-            // }
+
             console.log(outerarr.length)
-            
+            // outerarr[i]['Shares'] = {Shares: project.details.Shares, AverageCostPerShare:project.details.AverageCostPerShare}
             let i = 0
             // while (i < 1001){
             //     console.log(i)
@@ -145,8 +153,10 @@ useEffect(()=>{
                 console.log(outerarr.length)
                console.log(alldetails)
                setcount(mycount)
+               //alldetails.slice(0, count).concat(alldetails.slice(2*count+1))
                 setalldetails(outerarr)
-               }, 800);
+                // setalldetails(outerarr.slice(0, count).concat(alldetails.slice(2*count+1)))
+               }, 1000);
     }
     // console.log("use effect is here")
     // const mydbtickerlist = []  
@@ -185,9 +195,60 @@ useEffect(()=>{
         console.log("////////////////////////////////")
     }
 
+    
+
     let updatedDetailsFlag = true
-    function storeDetailsinDatabase(tickersymbol, shares, acpershare, date, results){
-        console.log(tickersymbol, shares, acpershare, date)
+    // async function updatefirestore(tickersymbol, results){
+    //     // const updatedDetails = {
+    //     //     details : results
+    //     // }
+
+    //     try{
+    //         // const userRef = ref(getDatabase(), 'users/' + currentUser.uid + '/tickers')
+    //         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+    //             const listkeys = Object.keys(snapshot.val())
+    //             Object.values(snapshot.val()).map((project, item) => {
+    //                     // console.log(Object.keys(snapshot.val()))
+    //                     if ((project.portfoliostockSymbol === tickersymbol) && (project.details === '')){
+    //                         console.log(project.details)
+    //                         console.log(project.portfoliostockSymbol)
+    //                         const db = getDatabase()
+    //                         const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
+    //                             console.log(updatedDetailsFlag)
+    //                             if(updatedDetailsFlag === true){
+    //                                 updatedDetailsFlag = false
+    //                                 console.log(reference)
+    //                                 update(reference,{
+    //                                     details: results
+    //                                 });
+                                    
+    //                             }
+    //                     }
+                        
+    //                     // if ((project.portfoliostockSymbol === tickersymbol) && (project.details.Shares === currentshares) && (project.details.AverageCostPerShare === current_sv)) {
+    //                     //     console.log('dfsfsfasfdsf')
+    //                     //     const db = getDatabase()
+    //                     //     const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
+    //                     //     if(updatedDetailsFlag === true){
+    //                     //         updatedDetailsFlag = false
+    //                     //         console.log(reference)
+    //                     //         update(reference,{
+    //                     //             details: results    
+    //                     //         });
+                                
+    //                     //     }
+    //                     // }
+    //                      else {
+    //                         console.log("not matched")
+    //                     }
+                        
+    //                 })     
+    //             })
+    //     }catch(error){
+    //         console.log(error)
+    //     }
+    // }
+    function storeDetailsinDatabase(tickersymbol, results){
         console.log(currentshares, current_sv)
         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
             console.log(snapshot)
@@ -207,7 +268,7 @@ useEffect(()=>{
                                 updatedDetailsFlag = false
                                 console.log(reference)
                                 update(reference,{
-                                    details: results,
+                                    details: results
                                 });
                                 
                             }
@@ -221,11 +282,12 @@ useEffect(()=>{
                             updatedDetailsFlag = false
                             console.log(reference)
                             update(reference,{
-                                details: results,     
+                                details: results    
                             });
                             
                         }
-                    } else {
+                    }
+                     else {
                         console.log("not matched")
                     }
                     
@@ -242,23 +304,49 @@ useEffect(()=>{
         // }
     }
     
-
+const [clickedstock, setclickedstock] = useState(true)
     useEffect(() => {
         console.log(Results)
         console.log(alldetails)
         for(let i=0; i<alldetails.length; i++){
             for (let j=0; j< Results.length; j++){
                 console.log(j)
-                if(i === Results[j].id){
+                if(i === Results[j].id){ 
+                    setclickedstock(false)
+
+                    storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])
+                    // updatefirestore(alldetails[i][0].ticker, Results[0])
                     console.log(alldetails[i][0].ticker)
                     alldetails[i]['Shares'] = Results[j]
-                    setalldetails(alldetails)
-                    if(Results.length > 0){
-                        storeDetailsinDatabase(alldetails[i][0].ticker, Results[0].Shares, Results[0].AverageCostPerShare, Results[0].date, Results[0])
-                    }
+                    console.log(alldetails)
+
+                    console.log(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
+                    let l = alldetails.length
+                    setalldetails(alldetails.slice(0,l))
+                    // setTimeout(()=>{setalldetails(alldetails.slice(0,l))},1000)
+                    // setalldetails(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
+                    // console.log(alldetails.length)
+                //    setalldetails(alldetails)
+                    //setTimeout(()=>{storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])},2000)
+                    
                 }
             }
+
+            
         }
+
+        // for(let i=0; i<alldetails.length; i++){
+        //     for (let j=0; j< Results.length; j++){
+        //         console.log(j)
+        //         if(i === Results[j].id){
+        //             console.log(alldetails[i][0].ticker)
+        //            storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])
+                    
+        //         }
+        //     }
+
+            
+        // }
         console.log(Results)
 
         
@@ -298,6 +386,8 @@ useEffect(()=>{
  
 
     const [clickedsearch, setclickSearch] = useState(false)
+    const [searchTimes, setsearchTimes] = useState(0)
+    
     useEffect(() => {
 
         // projects.map((item  )=>{
@@ -336,7 +426,7 @@ useEffect(()=>{
             //   });
       
         console.log(alldetails)
-       
+     
         if (shouldLog.current === true){
             setclickSearch(true)
             const updateAllDetails = async () => {
@@ -358,6 +448,7 @@ useEffect(()=>{
                 }
 
                 if (arr.length>0) {
+                    setsearchTimes(searchTimes+1)
                     console.log(arr)
                     console.log(alldetails)
                     // if(alldetails.length >= 1) {
@@ -371,8 +462,26 @@ useEffect(()=>{
                             console.log(items)
                         })   
                     }
+
+
                     setTimeout(
-                        () => setalldetails([...alldetails, arr]),
+                        () => {
+                            console.log(alldetails)
+                            console.log(alldetails.length)
+                            setalldetails([...alldetails, arr])
+                            // if (alldetails.length===1){
+                            //     console.log("here")
+                            //     setalldetails([...alldetails, arr])
+                            // }else{
+                            //     setalldetails(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
+                            //     setalldetails([...alldetails, arr])
+                            // }
+                 
+                            console.log(alldetails)
+                            console.log(alldetails.length)
+                        //    console.log(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
+        
+                        },
                         2000
                     )
                     
@@ -416,6 +525,7 @@ useEffect(()=>{
             
               setstockList([...stockList, portfoliostockSymbol])
             //   itemsList.push({"symbol":portfoliostockSymbol, "data":pfresults})
+           
         
               console.log(stockList)
               console.log(resultname)
@@ -426,7 +536,7 @@ useEffect(()=>{
             // setStockDetails({})
             shouldLog.current = true
         }
-        
+
         console.log(stockList)
         console.log([...stockDetails])
  
@@ -507,13 +617,76 @@ useEffect(()=>{
                                 </a>
                             </td>
                         </tr> */}
-                        
+                        {/* {console.log(searchTimes)} */}
                         {console.log(alldetails)}
                         {console.log(count)}
                         {console.log(clickedsearch)}
+                        {console.log(clickedstock)}
                         {clickedsearch && console.log(count)}
+{/* {.slice(0,searchTimes)} */}
+                        { (count === 0) && alldetails.slice(1).map((item, index) => {
+                            console.log(item)
+                            return (
+                                <tr class="bg-gray-800" key={index}>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80" alt="unsplash image"/>
+                                    <div class="ml-3">
+                                        <div class="">{item[0].ticker}</div>
+                                        <div class="text-gray-500">{item[0].name}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{(item[1].pc)}</div> 
+                                        {/* {(quote[index].pc)} */}
+                                        <div class="text-gray-500">Post 258.20</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{(item[1].d)}</div>
+                                        <div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].Shares}</span>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare}</span>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare * item['Shares'].Shares}</span>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}</div>
+                                        <div class="text-gray-500">{((item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3 ">
+                                <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
+                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index, item['Shares'] && item['Shares'].Shares, item['Shares'] && item['Shares'].AverageCostPerShare)}>Edit</i>
+                                </a>
+                                <button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    <i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete</i>
+                                </button>
+                            </td>
+                        </tr>
+
+                            )
+                        }
+                        ) 
+                        }
                        
-                        { alldetails.slice(0, count).map((item, index) => {
+                        { (clickedstock===true & count>0)&&alldetails.slice(0,count).map((item, index) => {
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -575,7 +748,7 @@ useEffect(()=>{
                         ) 
                         }
 
-                        { alldetails.slice(2*count+1).map((item, index) => {
+                        {(clickedstock===true & count>0) && alldetails.slice(2*count+1).map((item, index) => {
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -636,7 +809,68 @@ useEffect(()=>{
                         }
                         ) 
                         }
+                        
+                        { (clickedstock===false & count>0)&&alldetails.map((item, index) => {
+                            console.log(item)
+                            return (
+                                <tr class="bg-gray-800" key={index}>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80" alt="unsplash image"/>
+                                    <div class="ml-3">
+                                        <div class="">{item[0].ticker}</div>
+                                        <div class="text-gray-500">{item[0].name}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{(item[1].pc)}</div> 
+                                        {/* {(quote[index].pc)} */}
+                                        <div class="text-gray-500">Post 258.20</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{(item[1].d)}</div>
+                                        <div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].Shares}</span>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare}</span>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare * item['Shares'].Shares}</span>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex align-items-center">
+                                    <div class="ml-3">
+                                        <div class="">{item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}</div>
+                                        <div class="text-gray-500">{((item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-3 ">
+                                <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
+                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index, item['Shares'] && item['Shares'].Shares, item['Shares'] && item['Shares'].AverageCostPerShare)}>Edit</i>
+                                </a>
+                                <button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    <i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete</i>
+                                </button>
+                            </td>
+                        </tr>
 
+                            )
+                        }
+                        ) 
+                        }
 
                         
                     </tbody>
