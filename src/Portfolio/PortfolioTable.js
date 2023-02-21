@@ -305,6 +305,7 @@ useEffect(()=>{
     }
     
 const [clickedstock, setclickedstock] = useState(true)
+const [clicksearch, setclicksearch] = useState(false)
     useEffect(() => {
         console.log(Results)
         console.log(alldetails)
@@ -312,7 +313,12 @@ const [clickedstock, setclickedstock] = useState(true)
             for (let j=0; j< Results.length; j++){
                 console.log(j)
                 if(i === Results[j].id){ 
-                    setclickedstock(false)
+                    if(clicksearch === true){
+                        setclickedstock(true)
+                    }else{
+                        setclickedstock(false)
+                    }
+                    
 
                     storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])
                     // updatefirestore(alldetails[i][0].ticker, Results[0])
@@ -451,6 +457,12 @@ const [clickedstock, setclickedstock] = useState(true)
                     setsearchTimes(searchTimes+1)
                     console.log(arr)
                     console.log(alldetails)
+                    if(clickedstock===false){
+                        setclicksearch(false)
+                    }else{
+                        setclicksearch(true)
+                    }
+                    
                     // if(alldetails.length >= 1) {
                     //     // alldetails.push()
                     //     co
@@ -556,7 +568,6 @@ const [clickedstock, setclickedstock] = useState(true)
                 <table class="table  text-gray-400 space-y-6 text-sm w-full">
                     <thead class="bg-gray-800 text-gray-500">
                         <tr>
-                    
                             <th class="p-3 text-left">Symbol</th>
                             <th class="p-3 text-left">Price</th>
                             <th class="p-3 text-left">Change %</th>
@@ -620,10 +631,12 @@ const [clickedstock, setclickedstock] = useState(true)
                         {/* {console.log(searchTimes)} */}
                         {console.log(alldetails)}
                         {console.log(count)}
-                        {console.log(clickedsearch)}
-                        {console.log(clickedstock)}
+
+
+                        {console.log("clicked search is " + clickedsearch)}
+                        {console.log("clicked stock is " + clickedstock)}
                         {clickedsearch && console.log(count)}
-{/* {.slice(0,searchTimes)} */}
+
                         { (count === 0) && alldetails.slice(1).map((item, index) => {
                             console.log(item)
                             return (
@@ -673,7 +686,7 @@ const [clickedstock, setclickedstock] = useState(true)
                             </td>
                             <td class="p-3 ">
                                 <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
-                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index, item['Shares'] && item['Shares'].Shares, item['Shares'] && item['Shares'].AverageCostPerShare)}>Edit</i>
+                                    <i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index+1, item['Shares'] && item['Shares'].Shares, item['Shares'] && item['Shares'].AverageCostPerShare)}>Edit</i>
                                 </a>
                                 <button href="#" class="text-gray-400 hover:text-red-100  ml-2">
                                     <i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete</i>
