@@ -83,9 +83,6 @@ useEffect(()=>{
         const collectionRef = ref(getDatabase(), 'users/' + currentUser.uid + '/tickers')
         console.log(collectionRef)
         console.log(collectionRef)
-        // const query = collectionRef.where('state', '==', 'CA');
-        // const snapshot = await query.count().get();
-        // console.log(snapshot.data().count);
 
         console.log(refresh)
         console.log("hi")
@@ -120,6 +117,8 @@ useEffect(()=>{
     
                     if (arr.length>0) {
                         console.log(arr)
+                        // console.log(Aproject.details)
+                        arr['Shares'] = project.details
                         // arr[i]['Shares'] = {Shares: project.details.Shares, AverageCostPerShare:project.details.AverageCostPerShare}
                         outerarr.push(arr)
                         // setalldetails([...alldetails, arr])
