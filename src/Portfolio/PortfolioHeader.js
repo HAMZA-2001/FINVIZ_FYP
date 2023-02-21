@@ -6,8 +6,10 @@ import StockSearch from './StockSearch'
 function PortfolioHeader({symbol, price, name}) {
   return (
     <div className='header_container flex flex-col'>
-
-        <h1 div className='header_contents flex justify-start text-xl ml-3 mt-3'>{symbol}</h1>
+        <div className='flex-col text-xl items-center'>
+            <h1 className='header_contents flex justify-start text-xl ml-3 mt-3 content-center pb-6'>Portfolio Management System</h1>
+        </div>
+        
 
         <div className='flex flex-row justify-center mb-4'>
             <div className='flex flex-col pr-10'>

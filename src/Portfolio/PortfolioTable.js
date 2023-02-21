@@ -155,7 +155,7 @@ useEffect(()=>{
                //alldetails.slice(0, count).concat(alldetails.slice(2*count+1))
                 setalldetails(outerarr)
                 // setalldetails(outerarr.slice(0, count).concat(alldetails.slice(2*count+1)))
-               }, 1000);
+               }, 2000);
     }
     // console.log("use effect is here")
     // const mydbtickerlist = []  
@@ -637,6 +637,10 @@ const [clicksearch, setclicksearch] = useState(false)
                         {clickedsearch && console.log(count)}
 
                         { (count === 0) && alldetails.slice(1).map((item, index) => {
+                            console.log(item['Shares'])
+                            if(item['Shares'] < 0){
+                                    console.log("-ve")
+                                }
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -653,7 +657,6 @@ const [clicksearch, setclicksearch] = useState(false)
                                 <div class="flex align-items-center">
                                     <div class="ml-3">
                                         <div class="">{(item[1].pc)}</div> 
-                                        {/* {(quote[index].pc)} */}
                                         <div class="text-gray-500">Post 258.20</div>
                                     </div>
                                 </div>
@@ -699,6 +702,11 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
                        
                         { (clickedstock===true & count>0)&&alldetails.slice(0,count).map((item, index) => {
+                            
+                            console.log(item['Shares'])
+                            if(item['Shares'] < 0){
+                                    console.log("-ve")
+                                }
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -761,6 +769,10 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
 
                         {(clickedstock===true & count>0) && alldetails.slice(2*count+1).map((item, index) => {
+                            console.log(item['Shares'])
+                            if(item['Shares'].Shares < 0){
+                                    console.log("-ve")
+                                }
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -823,12 +835,17 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
                         
                         { (clickedstock===false & count>0)&&alldetails.map((item, index) => {
+                            console.log(item['Shares'])
+                            {/* let srcImg = "https://www.iconsdb.com/icons/preview/green/buy-xxl.png"
+                            if(item['Shares'].Shares < 0){
+                                    srcImg = "https://cdn.free-printable-signs.com/images/sold-sign.png"
+                                } */}
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
                             <td class="p-3">
                                 <div class="flex align-items-center">
-                                    <img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80" alt="unsplash image"/>
+                                    <img class="rounded-full h-12 w-12  object-cover" src={"https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80"} alt="unsplash image"/>
                                     <div class="ml-3">
                                         <div class="">{item[0].ticker}</div>
                                         <div class="text-gray-500">{item[0].name}</div>

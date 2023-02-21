@@ -1,5 +1,5 @@
 import DateFnsUtils from '@date-io/date-fns'
-import { Button, Grid, makeStyles, TextField } from '@material-ui/core'
+import { Button, FormControlLabel, FormLabel, Grid, makeStyles, Radio, RadioGroup, TextField } from '@material-ui/core'
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import React, { useContext, useState } from 'react'
 import * as userService from "./userService"
@@ -18,7 +18,8 @@ const initialFValues = {
     id: 0,
     Shares: '',
     AverageCostPerShare: '',
-    date: new Date()
+    date: new Date(),
+    Action: 'buy'
 }
 
 function UserForm({idx}) {
@@ -32,6 +33,8 @@ function UserForm({idx}) {
 
     const handleInputChange = e => {
         const {name, value} = e.target
+        console.log(name)
+        console.log(value)
         setValues(
             {
                 ...values,
@@ -60,6 +63,22 @@ function UserForm({idx}) {
     const handleSubmit = e => {
         console.log("clicked")
         e.preventDefault()
+        if(values.Action === "sell"){
+            console.log("hello")
+            console.log(-1*values.Shares)
+            console.log(values)
+            const newArray = values
+            values.Shares = -1*values.Shares
+            setValues(values)
+
+            // setValues(
+            //     {
+            //         ...values,
+            //         ["Shares"]: -1*values.Shares //update the changing values
+            //     }
+            // )
+            // values.Shares = toString(-1 * parseInt(values.Shares))
+        }
         userService.insertUser(values, idx)
         // userService.updateUser(values)
         console.log(values)
@@ -99,6 +118,21 @@ function UserForm({idx}) {
                     onChange={date => handleInputChange(convertToDefEventPara('date', date))}
                     />
             </MuiPickersUtilsProvider>
+
+
+            <div>
+            <FormLabel>Action</FormLabel>
+            <RadioGroup row = {true}
+                name = "Action"
+                value = {values.Action}
+                onChange = {handleInputChange}
+            >
+                <FormControlLabel value="buy" control={<Radio/>} label="Buy"/>
+                <FormControlLabel value="sell" control={<Radio/>} label="Sell"/>
+            </RadioGroup>
+            </div>
+            
+
             <div className='flex flex-row x-3 p-3 justify-center'>
             <Button className='m-4'
                 variant = "contained"
@@ -108,7 +142,6 @@ function UserForm({idx}) {
                 type = "submit"
                 > Submit
             </Button>
-
             </div>
 
             
