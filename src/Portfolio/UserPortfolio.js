@@ -1,3 +1,4 @@
+import { transition } from 'd3'
 import { getDatabase, onValue, push, ref, set } from 'firebase/database'
 import React, { useContext, useState } from 'react'
 import { useMemo } from 'react'
@@ -16,6 +17,9 @@ function UserPortfolio() {
 
     const [number, setNumber] = useState(0)
     const {currentUser} = useAuth()
+
+    // Variables for going to prev and next pages in tables
+    const [next, setNext] = useState(false)
     // const lentickerArray = useMemo(() => {
     //   return getTAlen(number)
     // }, [number]) 
@@ -35,7 +39,14 @@ function UserPortfolio() {
         
     //     return num
     // }
-    
+    function TransectionsInput(e){
+      setNext(false)
+    }
+
+    function handleStockTrackerInput(e){
+      setNext(true)
+      console.log(e.target)
+    }
     
     useEffect(() => {
       const updatePfDetails = async () => {

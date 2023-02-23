@@ -637,10 +637,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         {clickedsearch && console.log(count)}
 
                         { (count === 0) && alldetails.slice(1).map((item, index) => {
-                            console.log(item['Shares'])
-                            if(item['Shares'] < 0){
-                                    console.log("-ve")
-                                }
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -702,11 +698,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
                        
                         { (clickedstock===true & count>0)&&alldetails.slice(0,count).map((item, index) => {
-                            
-                            console.log(item['Shares'])
-                            if(item['Shares'] < 0){
-                                    console.log("-ve")
-                                }
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -723,7 +714,6 @@ const [clicksearch, setclicksearch] = useState(false)
                                 <div class="flex align-items-center">
                                     <div class="ml-3">
                                         <div class="">{(item[1].pc)}</div> 
-                                        {/* {(quote[index].pc)} */}
                                         <div class="text-gray-500">Post 258.20</div>
                                     </div>
                                 </div>
@@ -769,10 +759,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
 
                         {(clickedstock===true & count>0) && alldetails.slice(2*count+1).map((item, index) => {
-                            console.log(item['Shares'])
-                            if(item['Shares'].Shares < 0){
-                                    console.log("-ve")
-                                }
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -835,11 +821,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
                         
                         { (clickedstock===false & count>0)&&alldetails.map((item, index) => {
-                            console.log(item['Shares'])
-                            {/* let srcImg = "https://www.iconsdb.com/icons/preview/green/buy-xxl.png"
-                            if(item['Shares'].Shares < 0){
-                                    srcImg = "https://cdn.free-printable-signs.com/images/sold-sign.png"
-                                } */}
                             console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
@@ -856,7 +837,6 @@ const [clicksearch, setclicksearch] = useState(false)
                                 <div class="flex align-items-center">
                                     <div class="ml-3">
                                         <div class="">{(item[1].pc)}</div> 
-                                        {/* {(quote[index].pc)} */}
                                         <div class="text-gray-500">Post 258.20</div>
                                     </div>
                                 </div>

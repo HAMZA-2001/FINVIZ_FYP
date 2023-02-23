@@ -32,7 +32,7 @@ function Header() {
            <a href='/'>Dashboard</a>
             <a href='http://localhost:3000/viz'>Visualization</a>
             <a href='http://localhost:3000/portfolio'>Profolio</a>
-            <a href='#'>News</a>
+            <a href='http://localhost:3000/tracker'>Tracker</a>
             <a href='http://localhost:3000/userprofile'>Account</a>
             <button onClick = {handleLogout.bind(this)} className='btn text-white bg-sky-900 text-md pt-1 pb-1 pr-2 pl-2 ml-2 rounded hover:bg-blue-700 focus:outline-none' >Log Out {currentUser.email}</button>
         </div>

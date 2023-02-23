@@ -15,6 +15,7 @@ import UserProfile from './UserProfiling/UserProfile';
 import UserPortfolio from './Portfolio/UserPortfolio';
 import StockPortfolioContext from './Portfolio/StockPortfolioContext';
 import * as userService from './Portfolio/constants/UserForm/userService'
+import PortfolioSummary from './PortfolioTracker/PortfolioSummary';
 function App() {
   const [stockSymbol, setStockSymbol] = useState("FB")
    const [portfoliostockSymbol, setportfoliostockSymbol] = useState("")
@@ -78,6 +79,15 @@ function App() {
                 <Header/>
                 <Dashboard/>
               </StockContext.Provider>
+            </PrivateRoute>
+            </div>
+            } /> 
+
+        <Route path="/tracker" element={
+            <div>
+            <PrivateRoute>
+                <Header/>
+                <PortfolioSummary/>
             </PrivateRoute>
             </div>
             } /> 
