@@ -176,65 +176,290 @@ function PortfolioTracker() {
 
 
     let r = []
+    const [stockOverview, setstockOverview] = useState([])
+    let results = []
+    let URLList = []
+    let dlist = []
     useEffect(()=>{  
       console.log(filteredList)
-        // const getOverviewData = async (stockSymbol) => {
-        // try {
-        //     const result = await fetchStockOverview(stockSymbol)
-        //         r = result
-        //     } catch (error) {
-        //         console.log(error)
-        //     }
-        // }
-        // getOverviewData("AAPL")
-        async function fetchdata(symbol) {
-            const response = await fetch(
-              `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=R6DXIM881UZRQGUU`
-            );
-            const data = await response.json();
-            console.log(data)
-          }
-          filteredList.map((item, index)=>{
-            fetchdata(item.symbol)
-          })
-        
 
-      
+        const fetchdata = async (symbol) => {
+            const URL = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`;
+            const response = await fetch(URL);
+            if(!response.ok){
+                const message = `An error has occured: ${response.status}`
+                throw new Error(message);
+            }
+        
+            return await response.json();
+        }
+        
+        const updatePfOverview = async (symbol) => {
+            try {
+                const result = await fetchdata(symbol)
+                results.push(result)
+              
+            } catch (error) {
+                console.log(error)
+            }
+          }
+
+          filteredList.forEach((item, index)=>{
+                // URLList.push(`https://finnhub.io/api/v1/stock/profile2?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
+                // updatePfOverview(item.Symbol)
+                let datafile = fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
+                URLList.push(datafile)
+          })
+
+            // setTimeout(()=>{
+            //     console.log("hi")
+            //     console.log(results)
+            // },3000)
+            
+        
+            
+            if(URLList.length === filteredList.length){
+                console.log(URLList)
+                Promise.all(URLList).then(function (responses){
+                    console.log(responses)
+                    responses.forEach((url)=>{
+                        process(url.json())
+                    })
+                }).catch(function (error) {
+                    // if there's an error, log it
+                    console.log(error);
+                });
+            }
+
+            let process = (prom) => {
+                
+                prom.then(data=>{
+                    dlist.push(data)
+                    console.log(data)
+                })
+             
+            }
+
+            setTimeout(()=>{setstockOverview(dlist)},1000)
     },[filteredList])
+
+//https://finnhub.io/api/v1/quote?symbol=MSFT&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0
+    const [stockQuote, setstockQuote] = useState([])
+    let QuoteURLList = []
+    let qlist = [] 
+    useEffect(()=>{
+        console.log(stockOverview)
+
+        filteredList.forEach((item, index)=>{
+            // URLList.push(`https://finnhub.io/api/v1/stock/profile2?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
+            // updatePfOverview(item.Symbol)
+            let datafile = fetch(`https://finnhub.io/api/v1/quote?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
+            // QuoteURLList.push({
+            //     "ticker": item.Symbol,
+            //     "data": datafile
+            // })
+            QuoteURLList.push(datafile)
+      })
+
+        if(QuoteURLList.length === filteredList.length){
+            console.log(QuoteURLList)
+            Promise.all(QuoteURLList).then(function (responses){
+                console.log(responses)
+                responses.forEach((item, i)=>{
+                    process2(item.json(), filteredList[i].Symbol)
+                })
+            }).catch(function (error) {
+                // if there's an error, log it
+                console.log(error);
+            });
+        }
+
+        let process2 = (prom, ticker) => {
+            
+            prom.then(data=>{
+                qlist.push({"ticker": ticker, "quote_data": data})
+                console.log(data)
+            })
+         
+        }
+        setTimeout(()=>{
+            setstockQuote(qlist)
+        },1000)
+    },[stockOverview])
+
+    //capture everything into one list
+    const [summary, setSummary] = useState([])
+    useEffect(()=>{
+        console.log(filteredList)
+        console.log(stockOverview)
+        console.log(stockQuote)
+        const StocksSummary = filteredList
+        console.log(StocksSummary)
+        StocksSummary.forEach((summary, i)=>{
+            stockOverview.forEach((overview, j)=>{
+                if(summary.Symbol === overview.ticker){
+                    // console.log(summary.Symbol, overview.ticker)
+                    StocksSummary[i]["Sector"] = overview.finnhubIndustry
+                    StocksSummary[i]["name"] = overview.name
+                    StocksSummary[i]["marketcap"] = overview.marketCapitalization
+                    StocksSummary[i]["Sector"] = overview.finnhubIndustry
+                    StocksSummary[i]["logo"] = overview.logo
+                }
+            })
+
+            stockQuote.forEach((quote, j)=>{
+                if(summary.Symbol === quote.ticker){
+                    console.log(summary.Symbol, quote.ticker)
+                    StocksSummary[i]["Current_Price"] = quote.quote_data.c
+                    StocksSummary[i]["Change"] = quote.quote_data.d
+                    StocksSummary[i]["Percent_Change"] = quote.quote_data.d
+                    StocksSummary[i]["Previous_Close_price"] = quote.quote_data.d
+                    StocksSummary[i]["Highest_price"] = quote.quote_data.h
+                    StocksSummary[i]["Open_price"] = quote.quote_data.o
+                }
+            })
+        })
+
+        setTimeout(()=>{
+            console.log(StocksSummary)
+            setSummary(StocksSummary)
+        },1000)
+    },[stockQuote])
 
 
   return (
     <div className='relative overflow-hidden rounded-lg  w-full'>
-    <div className="overflow-hidden rounded-lg flex border border-gray-200 shadow-md w-full">
-    <div className="w-full flex border-collapse  text-left text-sm text-gray-500">
-                <table className="table  text-gray-400 space-y-6 text-sm w-full">
-                    <thead className="bg-gray-800 text-gray-500 w-full">
-                        <tr>
-                            <th className="p-3 text-left">Symbol</th>
-                            <th className="p-3 text-left">Allocation</th>
-                            <th className="p-3 text-left">Cost Basis</th>
-                            <th className="p-3 text-left">Sector</th>
-                            <th className="p-3 text-left">Size</th>
-                            <th className="p-3 text-left">Market Cap</th>
-                            <th className="p-3 text-left">Shares</th>
-                            <th className="p-3 text-left">Unit Basis ($)</th>
-                            <th className="p-3 text-left">Price</th>
-                            <th className="p-3 text-left">Position Value</th>
-                            <th className="p-3 text-left">Dividents Recieved</th>
-                            <th className="p-3 text-left">Amount Paid</th>
-                            <th className="p-3 text-left">Total Return</th>
-                            <th className="p-3 text-left">Portfolio Return</th>
-                            <th className="p-3 text-left">First Buy Date</th>
-                            <th className="p-3 text-left">Last Buy Date</th>
-                            <th className="p-3 text-left">Last Sell Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+        <div className="overflow-hidden rounded-lg flex border border-gray-200 shadow-md w-full">
+            <div className="w-full flex border-collapse  text-left text-sm text-gray-500">
+                        <table className="table  text-gray-400 space-y-6 text-sm w-full">
+                                <thead className="bg-gray-800 text-gray-500 w-full">
+                                        <tr>
+                                            <th className="p-3 text-left">Symbol</th>
+                                            <th className="p-3 text-left">Allocation</th>
+                                            <th className="p-3 text-left">Cost Basis</th>
+                                            <th className="p-3 text-left">Sector</th>
+                                            <th className="p-3 text-left">Size</th>
+                                            <th className="p-3 text-left">Market Cap (B)</th>
+                                            <th className="p-3 text-left">Shares</th>
+                                            <th className="p-3 text-left">Unit Basis ($)</th>
+                                            <th className="p-3 text-left">Price</th>
+                                            <th className="p-3 text-left">Position Value</th>
+                                            <th className="p-3 text-left">Dividents Recieved</th>
+                                            <th className="p-3 text-left">Amount Paid</th>
+                                            <th className="p-3 text-left">Total Return</th>
+                                            <th className="p-3 text-left">Portfolio Return</th>
+                                            <th className="p-3 text-left">First Buy Date</th>
+                                            <th className="p-3 text-left">Last Buy Date</th>
+                                            <th className="p-3 text-left">Last Sell Date</th>
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                    {summary.map((item, index)=>{
+                                        return (
+                                            <tr class="bg-gray-800" key={index}>
+                                                <td class="p-3">
+                                                    <div class="flex align-items-center">
+                                                    <img class="rounded-full h-12 w-12  object-cover" src={item.logo} alt="unsplash image"/>
+                                                        <div class="ml-3">
+                                                            <div class="">{item.Symbol}</div>
+                                                            <div class="text-gray-500">{item.name}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <div class="flex align-items-center">
+                                                        <span class="text-gray-20 rounded-md px-2 text-center">{item.Sector}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-20 rounded-md px-2">{(item.marketcap/100).toFixed(2)}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">{item.Total_Shares}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">{item.AverageCostPerShare.toFixed(2)}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">{item.Current_Price}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">-</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-20 rounded-md px-2">{item.First_Buy_Date}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-20 rounded-md px-2">{item.Last_Buy_Date}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-20 rounded-md px-2">{item.Last_Sell_Date}</span>
+                                                </td>
+
+                                                
+                                                {/* <td class="p-3">
+                                                    <div class="flex align-items-center">
+                                                        <div class="ml-3">
+                                                            <div class="">{(item[1].pc)}</div> 
+                                                            <div class="text-gray-500">Post 258.20</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="p-3">
+                                                    <div class="flex align-items-center">
+                                                        <div class="ml-3">
+                                                            <div class="">{(item[1].d)}</div>
+                                                            <div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].Shares}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare * item['Shares'].Shares}</span>
+                                                </td>
+                                                <td class="p-3">
+                                                    <div class="flex align-items-center">
+                                                        <div class="ml-3">
+                                                            <div class="">{item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}</div>
+                                                            <div class="text-gray-500">{((item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}</div>
+                                                        </div>
+                                                    </div>
+                                                </td> */}
+                                            </tr>
+
+                                    )
+                                    })}
+                                </tbody>
+                        </table>
+                    </div>
+                
             </div>
-          
-    </div>
     </div>
   )
 }
