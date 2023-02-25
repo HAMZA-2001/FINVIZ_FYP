@@ -1,6 +1,7 @@
 import { getDatabase, onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../Authentication/context/AuthContext';
+import PieChartVis from './PieChartVis';
 
 function convertISODate(isodate){
     const date = new Date(isodate);
@@ -316,9 +317,17 @@ function PortfolioTracker() {
                     StocksSummary[i]["Previous_Close_price"] = quote.quote_data.d
                     StocksSummary[i]["Highest_price"] = quote.quote_data.h
                     StocksSummary[i]["Open_price"] = quote.quote_data.o
+                    StocksSummary[i]["Position_Value"] = quote.quote_data.c * StocksSummary[i].Total_Shares
+                    StocksSummary[i]["Amount_Paid"] = StocksSummary[i].Total_Shares * StocksSummary[i].AverageCostPerShare
+                    StocksSummary[i]["Total_Return"] = ((quote.quote_data.c*StocksSummary[i].Total_Shares) - (StocksSummary[i].Total_Shares*StocksSummary[i].AverageCostPerShare))
                 }
             })
         })
+
+        // StocksSummary.forEach((item, index)=>{
+            
+        // })
+       
 
         setTimeout(()=>{
             console.log(StocksSummary)
@@ -326,142 +335,148 @@ function PortfolioTracker() {
         },1000)
     },[stockQuote])
 
+    const[allocationSum, setallocationSum] = useState(0)
+    const[paidamoutSum, setpaidamountSum] = useState(0)
+    const[totalreturnSum, settotalreturnSum] = useState(0)
+    useEffect(()=>{
+        let t = 0
+        let t2 = 0
+        let t3 = 0
+        summary.forEach((item, i)=>{
+            t = t + item.Position_Value
+            t2 = t2 + item.Amount_Paid
+            t3 = t3 + item.Total_Return            
+        })
+        setpaidamountSum(t2)
+        setallocationSum(t)
+        settotalreturnSum(t3)
+    },[summary])
+
 
   return (
-    <div className='relative overflow-hidden rounded-lg  w-full'>
-        <div className="overflow-hidden rounded-lg flex border border-gray-200 shadow-md w-full">
-            <div className="w-full flex border-collapse  text-left text-sm text-gray-500">
-                        <table className="table  text-gray-400 space-y-6 text-sm w-full">
-                                <thead className="bg-gray-800 text-gray-500 w-full">
-                                        <tr>
-                                            <th className="p-3 text-left">Symbol</th>
-                                            <th className="p-3 text-left">Allocation</th>
-                                            <th className="p-3 text-left">Cost Basis</th>
-                                            <th className="p-3 text-left">Sector</th>
-                                            <th className="p-3 text-left">Size</th>
-                                            <th className="p-3 text-left">Market Cap (B)</th>
-                                            <th className="p-3 text-left">Shares</th>
-                                            <th className="p-3 text-left">Unit Basis ($)</th>
-                                            <th className="p-3 text-left">Price</th>
-                                            <th className="p-3 text-left">Position Value</th>
-                                            <th className="p-3 text-left">Dividents Recieved</th>
-                                            <th className="p-3 text-left">Amount Paid</th>
-                                            <th className="p-3 text-left">Total Return</th>
-                                            <th className="p-3 text-left">Portfolio Return</th>
-                                            <th className="p-3 text-left">First Buy Date</th>
-                                            <th className="p-3 text-left">Last Buy Date</th>
-                                            <th className="p-3 text-left">Last Sell Date</th>
-                                        </tr>
-                                </thead>
-                                <tbody>
-                                    {summary.map((item, index)=>{
-                                        return (
-                                            <tr class="bg-gray-800" key={index}>
-                                                <td class="p-3">
-                                                    <div class="flex align-items-center">
-                                                    <img class="rounded-full h-12 w-12  object-cover" src={item.logo} alt="unsplash image"/>
-                                                        <div class="ml-3">
-                                                            <div class="">{item.Symbol}</div>
-                                                            <div class="text-gray-500">{item.name}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <div class="flex align-items-center">
-                                                        <span class="text-gray-20 rounded-md px-2 text-center">{item.Sector}</span>
-                                                    </div>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-20 rounded-md px-2">{(item.marketcap/100).toFixed(2)}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">{item.Total_Shares}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">{item.AverageCostPerShare.toFixed(2)}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">{item.Current_Price}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">-</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-20 rounded-md px-2">{item.First_Buy_Date}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-20 rounded-md px-2">{item.Last_Buy_Date}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-20 rounded-md px-2">{item.Last_Sell_Date}</span>
-                                                </td>
+    <div>
+    <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows auto-rows-fr'>
+     <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 pt-20 grid-rows auto-rows-fr'>
+        <div className='m-3 row-span-5 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
+                <div className='relative overflow-hidden rounded-lg  w-full'>
+                    <div className="overflow-hidden rounded-lg flex border border-gray-200 shadow-md w-full">
+                        <div className="w-full flex border-collapse  text-left text-sm text-gray-500">
+                                    <table className="table  text-gray-400 space-y-6 text-sm w-full">
+                                            <thead className="bg-gray-800 text-gray-500 w-full">
+                                                    <tr>
+                                                        <th className="p-3 text-left">Symbol</th>
+                                                        <th className="p-3 text-left">Allocation (%)</th>
+                                                        <th className="p-3 text-left">Cost Basis ($)</th>
+                                                        <th className="p-3 text-left">Sector</th>
+                                                        <th className="p-3 text-left">Size</th>
+                                                        <th className="p-3 text-left">Market Cap (B)</th>
+                                                        <th className="p-3 text-left">Shares</th>
+                                                        <th className="p-3 text-left">Unit Basis ($)</th>
+                                                        <th className="p-3 text-left">Price ($)</th>
+                                                        <th className="p-3 text-left">Position Value ($)</th>
+                                                        <th className="p-3 text-left">Dividents Recieved ($)</th>
+                                                        <th className="p-3 text-left">Amount Paid ($)</th>
+                                                        <th className="p-3 text-left">Total Return ($)</th>
+                                                        <th className="p-3 text-left">Portfolio Return ($)</th>
+                                                        <th className="p-3 text-left">First Buy Date</th>
+                                                        <th className="p-3 text-left">Last Buy Date</th>
+                                                        <th className="p-3 text-left">Last Sell Date</th>
+                                                    </tr>
+                                            </thead>
+                                            <tbody>
+                                                {summary.map((item, index)=>{
+                                                    return (
+                                                        <tr class="bg-gray-800" key={index}>
+                                                            <td class="p-3">
+                                                                <div class="flex align-items-center">
+                                                                <img class="rounded-full h-12 w-12  object-cover" src={item.logo} alt="unsplash image"/>
+                                                                    <div class="ml-3">
+                                                                        <div class="">{item.Symbol}</div>
+                                                                        <div class="text-gray-500">{item.name}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{((item.Position_Value/allocationSum)*100).toFixed(2)}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{((item.Amount_Paid/paidamoutSum)*100).toFixed(2)}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <div class="flex align-items-center">
+                                                                    <span class="text-gray-20 rounded-md px-2 text-center">{item.Sector}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">-</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-20 rounded-md px-2">{(item.marketcap/100).toFixed(2)}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{item.Total_Shares}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{item.AverageCostPerShare.toFixed(2)}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{item.Current_Price}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{(item.Current_Price*item.Total_Shares).toFixed(2)}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">-</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{(item.Total_Shares*item.AverageCostPerShare).toFixed(0)}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <div class="flex align-items-center">
+                                                                    <div class="ml-3">
+                                                                        <div class="">{((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare)).toFixed(2)}</div> 
+                                                                        <div class="text-gray-500">{(((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare))/(item.Total_Shares*item.AverageCostPerShare)*100).toFixed(2) + "%"}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-50 rounded-md px-2">{(-item.Total_Return/totalreturnSum * 100).toFixed(2)}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-20 rounded-md px-2">{item.First_Buy_Date}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-20 rounded-md px-2">{item.Last_Buy_Date}</span>
+                                                            </td>
+                                                            <td class="p-3">
+                                                                <span class="text-gray-20 rounded-md px-2">{item.Last_Sell_Date}</span>
+                                                            </td>
+                                                        </tr>
 
-                                                
-                                                {/* <td class="p-3">
-                                                    <div class="flex align-items-center">
-                                                        <div class="ml-3">
-                                                            <div class="">{(item[1].pc)}</div> 
-                                                            <div class="text-gray-500">Post 258.20</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-3">
-                                                    <div class="flex align-items-center">
-                                                        <div class="ml-3">
-                                                            <div class="">{(item[1].d)}</div>
-                                                            <div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].Shares}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <span class="text-gray-50 rounded-md px-2">{item['Shares'] && item['Shares'].AverageCostPerShare * item['Shares'].Shares}</span>
-                                                </td>
-                                                <td class="p-3">
-                                                    <div class="flex align-items-center">
-                                                        <div class="ml-3">
-                                                            <div class="">{item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}</div>
-                                                            <div class="text-gray-500">{((item['Shares'] && (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}</div>
-                                                        </div>
-                                                    </div>
-                                                </td> */}
-                                            </tr>
-
-                                    )
-                                    })}
-                                </tbody>
-                        </table>
-                    </div>
-                
+                                                )
+                                                })}
+                                            </tbody>
+                                    </table>
+                                </div>
+                            
+                        </div>
+                    </div> 
+                </div>
             </div>
+        </div>
+
+        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-2 pt-20 grid-rows-8 auto-rows-fr'>
+            <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
+                <PieChartVis Summary = {summary}/>
+            </div>
+            <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
+                Visualization
+            </div>
+        </div>                                
+    
     </div>
   )
+ 
 }
 
 export default PortfolioTracker
