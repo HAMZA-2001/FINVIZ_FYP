@@ -1,6 +1,7 @@
 import { getDatabase, onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../Authentication/context/AuthContext';
+import BarChartVis from './BarChartVis';
 import PieChartVis from './PieChartVis';
 
 function convertISODate(isodate){
@@ -467,10 +468,10 @@ function PortfolioTracker() {
 
         <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-2 pt-20 grid-rows-8 auto-rows-fr'>
             <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
-                <PieChartVis Summary = {summary}/>
+                <PieChartVis Summary = {summary} PMS = {paidamoutSum}/>
             </div>
             <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
-                Visualization
+                  <BarChartVis/>                              	
             </div>
         </div>                                
     
