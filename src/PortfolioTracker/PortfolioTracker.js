@@ -471,7 +471,7 @@ function PortfolioTracker() {
                 <PieChartVis Summary = {summary} PMS = {paidamoutSum}/>
             </div>
             <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
-                  <BarChartVis/>                              	
+                  <BarChartVis Summary = {summary} PMS = {paidamoutSum}/>                              	
             </div>
         </div>                                
     

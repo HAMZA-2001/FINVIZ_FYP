@@ -141,6 +141,7 @@ function PieChartVis({Summary, PMS}) {
      }
 
     useEffect(()=>{
+       
         var svg = d3.select(svgRef.current)
         svg.selectAll(".group").remove()
 
