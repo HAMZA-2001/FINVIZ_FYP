@@ -2,7 +2,9 @@ import { getDatabase, onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../Authentication/context/AuthContext';
 import BarChartVis from './BarChartVis';
+import ComparingStocksVis from './ComparingStocksVis';
 import PieChartVis from './PieChartVis';
+import StackedBarChart from './StackedBarChart';
 
 function convertISODate(isodate){
     const date = new Date(isodate);
@@ -466,14 +468,27 @@ function PortfolioTracker() {
             </div>
         </div>
 
-        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-2 pt-20 grid-rows-8 auto-rows-fr'>
+        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-2 pt-20 grid-rows-1 auto-rows-fr'>
             <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
                 <PieChartVis Summary = {summary} PMS = {paidamoutSum}/>
             </div>
             <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
                   <BarChartVis Summary = {summary} PMS = {paidamoutSum}/>                              	
             </div>
-        </div>                                
+            
+        </div>     
+
+        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-1 auto-rows-fr'>
+        <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
+                {/* <ComparingStocksVis/> */}
+            </div>
+        </div>
+
+        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-6 auto-rows-fr'>
+        <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
+               <StackedBarChart Summary = {summary}/>
+            </div>
+        </div>
     
     </div>
   )
