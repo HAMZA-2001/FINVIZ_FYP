@@ -20,6 +20,7 @@ function ComparingStocksVis({Summary}) {
   const y_Label = useRef()
   const x_axis = useRef()
   const y_axis = useRef()
+  const groupRef = useRef()
 
     const [filter, setFilter] = useState("1W");
  
@@ -202,6 +203,29 @@ function ComparingStocksVis({Summary}) {
                   .attr("stroke-width", "2.5px")
                   .attr("d", d => line(d.values))
 
+
+                   var color = d3.scaleOrdinal(d3.schemeCategory10)
+
+                  var legend = d3.select(groupRef.current)
+                  .attr("class", "legend")
+                  .attr("transform", "translate(" + (WIDTH + 120) + "," + 20 + ")")
+                  .selectAll("g")
+                  .data(filteredData)
+                  .enter().append("g")
+                  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+          
+                  legend.append("rect")
+                  .attr("width", 18)
+                  .attr("height", 18)
+                  .style("fill", function(d, i) { return color(i) });
+          
+                  legend.append("text")
+                  .attr("x", 24)
+                  .attr("y", 9)
+                  .attr("dy", ".35em")
+                  .attr("fill", "white" )
+                  .text(function(d) { return d.key});
+            
                   
       }
       
@@ -251,6 +275,8 @@ function ComparingStocksVis({Summary}) {
     <div>
     
                 <svg ref={Chart_Area} width="800" height="500">
+                  <g ref={groupRef}>
+                  </g>
                     <g ref={Group_Area}  >
                     <text class="y axisLabel" ref={y_Label}>Open</text> 
                     <text class="x axisLabel" ref={x_Label}>Years</text>
