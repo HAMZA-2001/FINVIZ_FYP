@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as d3 from "d3";
-import { scaleOrdinal, select, zoomTransform } from 'd3';
+import { index, scaleOrdinal, select, zoomTransform } from 'd3';
 import { type } from '@testing-library/user-event/dist/type';
 import { Group } from '@material-ui/icons';
 import { FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Radio, RadioGroup, Select } from '@material-ui/core';
@@ -13,11 +13,12 @@ function PieChartVis({Summary, PMS}) {
     const groupRef = useRef()
     const divRef = useRef()
     
+    const [selectValue, setselectValue] = useState("")
     const [selectedData, setSelectedData] = useState("mc")
 
     var width = 600
-    var height = 400
-    var radius = Math.min(width, height) / 2
+    var height = 500
+    var radius = Math.min(width, 400) / 2
     var color = d3.scaleOrdinal(d3.schemeCategory10)
     var arc = d3.arc()
         .outerRadius(radius - 20)
@@ -50,7 +51,7 @@ function PieChartVis({Summary, PMS}) {
         .attr("width", width)
         .attr("height", height)
         .append("g")
-        .attr("transform", "translate(" + width/2 + "," + height/2 + ")")
+        .attr("transform", "translate(" + (width-100)/2 + "," + height/2 + ")")
         .attr("class", "group")
         
         
@@ -76,6 +77,7 @@ function PieChartVis({Summary, PMS}) {
 
         g.append("path")
             .attr("d", arc)
+            .attr("class", "pathelm")
             .style("fill", function(d,i){return color(i)})
             .on('mouseover', function (event, d) {
                 d3.select(this).transition()
@@ -162,8 +164,8 @@ function PieChartVis({Summary, PMS}) {
             .innerRadius(radius - 80)
 
         var arcOut = d3.arc()
-        .outerRadius(radius - 20)
-        .innerRadius(radius - 80)
+            .outerRadius(radius - 20)
+            .innerRadius(radius - 80)
         
        
         var svg = d3.select(svgRef.current)
@@ -174,11 +176,25 @@ function PieChartVis({Summary, PMS}) {
         .attr("width", width)
         .attr("height", height)
         .append("g")
-        .attr("transform", "translate(" + width/2 + "," + height/2 + ")")
+        .attr("transform", "translate(" + (width-100)/2 + "," + height/2 + ")")
+        // .attr("transform", "translate(" + width/2 + "," + height/2 + ")")
         .attr("class", "group")
 
 
         let d = Summary
+        console.log(d)
+        console.log(Summary)
+        console.log(overview)
+        // if (overview.length>0){
+        //     d.forEach((element,i)=>{
+        //         overview.forEach((overview_elm)=>{
+        //             if(element.Symbol === overview_elm.ticker){
+        //                 d[i]["PERatio"] = overview_elm.PERatio
+        //             }
+        //         })
+        //         // if (element.Symbol === )
+        //     })
+        // }
 
         var g = svg.selectAll(".arc")
             .data(pie(d))
@@ -201,11 +217,12 @@ function PieChartVis({Summary, PMS}) {
 
         g.append("path")
             .attr("d", arc)
+            .attr("class", "pathClass")
             .style("fill", function(d,i){return color(i)})
             .on('mouseover', function (event, d) {
                 d3.select(this).transition()
                 .duration('50')
-                .attr("d", arcOver)             
+                // .attr("d", arcOver)             
                 .attr("stroke-width",16);
         
                 div.transition()
@@ -241,58 +258,34 @@ function PieChartVis({Summary, PMS}) {
                 let fill = "<h1>"+ num +"</h1>" + hoverIMG
                 
                 div.html(fill)
-                .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 15) + "px");
+                // .style("left", "350px")
+                // .style("top", "1250px")
+                // .style("width", "100%")
+                // .style("height", "100%")
+                .style("left", (event.pageX - 10) + "px")
+                .style("top", (event.pageY + 15) + "px");
                 })
             .on('mouseout', function (d, i) {
-                console.log(i.index, clickedIdx)
-                //makes arc smaller
-                if(!clicked){
-                    d3.select(this).transition()
-                    .duration('50')
-                    .attr("d", arcOut)             
+                    d3.select(this)      
                     .attr("stroke-width",6)
                     .attr('opacity', '1');
                     div.transition()
-                    .duration('50')
                     .style("opacity", 0);
+                //makes arc smaller
+                // if(!clicked){
+                    // d3.select(this).transition()
+                    // .duration('50')
+                    // .attr("d", arcOut)             
+                    // .attr("stroke-width",6)
+                    // .attr('opacity', '1');
+                    // div.transition()
+                    // .duration('50')
+                    // .style("opacity", 0);
 
                 // makes arc bigger
-                }else if(clicked && i.index === clickedIdx){
-                    clicked = false
-                    d3.select(this).transition()
-                    .duration('50')
-                    .attr("d", arcOver)             
-                    .attr("stroke-width",6)
-                    .attr('opacity', '1');
-                    div.transition()
-                    .duration('50')
-                    .style("opacity", 1);
-
-                    // want to make a div to stay when the user click on the pie chart
-                    // svg.append("div")
-
-                }
-
-
-                
-                })
-            .on('click', function(d, i){
-                // user clicks this then 
-                if(!clicked){
-                    clicked = !clicked
-                    clickedIdx = i.index
-                }
-
-                // console.log(i)
-                // setclicked(false)
-                // target the index
-
-                
-               
-                console.log(clicked)
-                console.log(clickedIdx)
-                // if (!click) {
+                // }
+                // else if(clicked && i.index === clickedIdx){
+                //     clicked = false
                 //     d3.select(this).transition()
                 //     .duration('50')
                 //     .attr("d", arcOver)             
@@ -301,31 +294,95 @@ function PieChartVis({Summary, PMS}) {
                 //     div.transition()
                 //     .duration('50')
                 //     .style("opacity", 1);
-                //     setclick(true)
-                // }else{
-                //     d3.select(this).transition()
-                //     .duration('50')
-                //     .attr("d", arcOver)             
-                //     .attr("stroke-width",6)
-                //     .attr('opacity', '1');
-                //      div.transition()
-                //     .duration('50')
-                //     .style("opacity", 0);
-                //     setclick(false)
+
+                //     // want to make a div to stay when the user click on the pie chart
+                //     // svg.append("div")
+
                 // }
-            })
+
+
+                
+                })
+            // .on('click', function(d, i){
+            //     // user clicks this then 
+            //     if(!clicked){
+            //         clicked = !clicked
+            //         clickedIdx = i.index
+            //     }
+
+            //     console.log(clicked)
+            //     console.log(clickedIdx)
+
+            // })
         ;
 
-        g.append("text")
-        .attr("transform", function(d){
-            d.innerRadius = radius - 80;
-            d.outerRadius = radius - 20;
-            return "translate(" + arc.centroid(d) + ")";
-            })
-            .attr("text-anchor", "middle")
-            .text( function(d, i) {
-            return (d.data.Symbol)}
-            );
+        // g.append("text")
+        // .attr("transform", function(d){
+        //     d.innerRadius = radius - 80;
+        //     d.outerRadius = radius - 20;
+        //     return "translate(" + arc.centroid(d) + ")";
+        //     })
+        //     .attr("text-anchor", "middle")
+        //     .text( function(d, i) {
+        //     return (d.data.Symbol)}
+        //     );
+
+        if(selectValue === "PERatio"){
+            console.log("peratio is set")
+            console.log(overview)
+            var modifyArc = d3.arc()
+                .outerRadius(function(d){
+                    if(d.data.PERatio === "None"){
+                        return radius -20
+                    }else{
+                        return radius -20 + parseInt(d.data.PERatio)
+                    }
+                   
+                })
+                .innerRadius(radius - 80)
+                    const t = d3.transition().duration(750)
+                    g.selectAll(".pathClass").transition(t).attr("d", modifyArc)
+        }if(selectValue === "PEGRatio"){
+            var modifyArc = d3.arc()
+                .outerRadius(function(d){
+                    if(d.data.PEGRatio === "None"){
+                        return radius -20
+                    }else{
+                        return radius -20 + parseInt(d.data.PEGRatio*5)
+                    }
+                   
+                })
+                .innerRadius(radius - 80)
+                    const t = d3.transition().duration(750)
+                    g.selectAll(".pathClass").transition(t).attr("d", modifyArc)
+        }if(selectValue === "Beta"){
+            var modifyArc = d3.arc()
+                .outerRadius(function(d){
+                    if(d.data.Beta === "None"){
+                        return radius -20
+                    }else{
+                        return radius -20 + parseInt(d.data.Beta*5)
+                    }
+                   
+                })
+                .innerRadius(radius - 80)
+                    const t = d3.transition().duration(750)
+                    g.selectAll(".pathClass").transition(t).attr("d", modifyArc)
+        }if(selectValue === "EPS"){
+            var modifyArc = d3.arc()
+                .outerRadius(function(d){
+                    if(d.data.EPS === "None"){
+                        return radius -20
+                    }else{
+                        return radius -20 + parseInt(d.data.EPS*5)
+                    }
+                   
+                })
+                .innerRadius(radius - 80)
+                    const t = d3.transition().duration(750)
+                    g.selectAll(".pathClass").transition(t).attr("d", modifyArc)
+
+        }
 
         // g.append(slider)
         // const innerGroup = g.append("g").attr("stroke", "lightgrey")
@@ -356,23 +413,23 @@ function PieChartVis({Summary, PMS}) {
         // .default(rgb[i])
         // .displayValue(false)
 
-        g.append('rect')
-            .attr('width', 20)
-            .attr('height', 30)
-            .attr('stroke', 'black')
-            .attr('fill', '#69a3b2')
-            .attr("width", "30px")
-                .attr("height", "5px")
-              //  .attr("transform", "rotate(90)")
-                .attr("transform", function(d){
-                    console.log(d)
-                    d.innerRadius = radius - 80;
-                    d.outerRadius = radius - 20;
-                    console.log(arc.centroid(d))
-                    console.log(((arc.centroid(d)[1]/arc.centroid(d)[0])))
-                    return "translate(" + [arc.centroid(d)] + ") rotate( " + ((180 - (arc.centroid(d)[1]/arc.centroid(d)[0]))) + ")";
-                    })
-                .attr("text-anchor", "middle")
+        // g.append('rect')
+        //     .attr('width', 20)
+        //     .attr('height', 30)
+        //     .attr('stroke', 'black')
+        //     .attr('fill', '#69a3b2')
+        //     .attr("width", "30px")
+        //         .attr("height", "5px")
+        //       //  .attr("transform", "rotate(90)")
+        //         .attr("transform", function(d){
+        //             console.log(d)
+        //             d.innerRadius = radius - 80;
+        //             d.outerRadius = radius - 20;
+        //             console.log(arc.centroid(d))
+        //             console.log(((arc.centroid(d)[1]/arc.centroid(d)[0])))
+        //             return "translate(" + [arc.centroid(d)] + ") rotate( " + ((180 - (arc.centroid(d)[1]/arc.centroid(d)[0]))) + ")";
+        //             })
+        //         .attr("text-anchor", "middle")
              
                 // .attr("fill", "white");
 
@@ -389,13 +446,68 @@ function PieChartVis({Summary, PMS}) {
         // const innerSVG = innerGroup.append('svg')
         // innerSVG.append("path").attr("d", "M21,11H17.81573a2.98208,2.98208,0,0,0-5.63146,0H3a1,1,0,0,0,0,2h9.18433a2.982,2.982,0,0,0,5.6314,0H21a1,1,0,0,0,0-2Zm-6,2a1,1,0,1,1,1-1A1.0013,1.0013,0,0,1,15,13Z")
 
-    },[selectedData])
+    },[selectedData, selectValue])
+
+    let Overview_URL_List = []
+    let OWlist = []
+    const [overview, setOverview] = useState([]) 
+
+    useEffect(()=>{
+        if(Summary.length > 0){
+            console.log(Summary)
+            Summary.forEach((item, index)=>{
+                let datatobefetched = fetch(`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${item.Symbol}&apikey=R6DXIM881UZRQGUU`)
+                Overview_URL_List.push(datatobefetched)
+            })
+
+            if(Overview_URL_List.length === Summary.length){
+                console.log(Overview_URL_List)
+                Promise.all(Overview_URL_List).then(function (responses){
+                    console.log(responses)
+                    responses.forEach((item, i)=>{
+                        process2(item.json(), Summary[i].Symbol)
+                    })
+                }).catch(function (error) {
+                    // if there's an error, log it
+                    console.log(error);
+                });
+            }
+    
+            let process2 = (prom, ticker) => {
+                
+                prom.then(data=>{
+                    OWlist.push({"ticker": ticker, "quote_data": data})
+                    console.log(data)
+                })
+             
+            }
+
+            setTimeout(()=>{
+                setOverview(OWlist)
+                console.log(OWlist)
+                if (OWlist.length>0){
+                    Summary.forEach((element,i)=>{
+                        OWlist.forEach((overview_elm)=>{
+                            if(element.Symbol === overview_elm.ticker){
+                                console.log(overview_elm)
+                                Summary[i]["PERatio"] = overview_elm.quote_data.PERatio
+                                Summary[i]["PEGRatio"] = overview_elm.quote_data.PEGRatio
+                                Summary[i]["Beta"] = overview_elm.quote_data.Beta
+                                Summary[i]["EPS"] = overview_elm.quote_data.EPS
+                            }
+                        })
+                        // if (element.Symbol === )
+                    })
+                }
+            },500)
+        }
+    },[Summary])
 
     function handleInputChange(event){
-        console.log("hi")
+        setselectValue(event.target.value)
     }
   return (
-    <div>
+    <div className='justify-center'>
 
         <div>
         <select id="var-select" className="form-control bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 inline text-center" defaultValue={'M'} onChange = {getSelectedValues.bind(this)}>
@@ -416,10 +528,10 @@ function PieChartVis({Summary, PMS}) {
                 name="row-radio-buttons-group"
             >
                 <FormControlLabel value="marketcap" control={<Radio />} label="Target Allocation" onChange={handleInputChange.bind(this)} />
-                <FormControlLabel value="AverageCostPerShare" control={<Radio />} label="P/E" onChange={handleInputChange.bind(this)} />
-                <FormControlLabel value="Total_Return" control={<Radio />} label="52 eeek range" onChange={handleInputChange.bind(this)}/>
-                <FormControlLabel value="Current_Price" control={<Radio />} label="Beta" onChange={handleInputChange.bind(this)}/>
-                <FormControlLabel value="Highest_price" control={<Radio />} label="EPS" onChange={handleInputChange.bind(this)}/>
+                <FormControlLabel value="PERatio" control={<Radio />} label="P/E" onChange={handleInputChange.bind(this)} />
+                <FormControlLabel value="PEGRatio" control={<Radio />} label="PEG Ratio" onChange={handleInputChange.bind(this)}/>
+                <FormControlLabel value="Beta" control={<Radio />} label="Beta" onChange={handleInputChange.bind(this)}/>
+                <FormControlLabel value="EPS" control={<Radio />} label="EPS" onChange={handleInputChange.bind(this)}/>
 
 
                 <FormControlLabel
@@ -431,15 +543,18 @@ function PieChartVis({Summary, PMS}) {
                 </RadioGroup>
             </FormControl>
             </div>
-            <div ref={divRef} className='bg-white'>
+            <div ref={divRef} className='bg-white' fill='blue'>
                 {/* <button ref={contentRef} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
                     Button
                     </button> */}
             </div>
-            <svg ref={svgRef} width="800" height="500">
+            <div className='h-full'>
+            <svg className= "pt-6" ref={svgRef} width="800" height="500">
                 <g ref={groupRef}>
                 </g>
             </svg>
+            </div>
+
         </div>
 
 

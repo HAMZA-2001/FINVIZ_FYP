@@ -6,6 +6,7 @@ function StackedBarChart({Summary}) {
 
 const svgRef = useRef()
 const wrapperRef =  useRef()
+const groupRef =  useRef()
 
 let keys = ["buy", "hold", "sell", "strongBuy", "strongSell"]
 let colors = {
@@ -21,6 +22,8 @@ const svg = d3.select(svgRef.current)
     .attr("transform", `translate(0, ${30})`);
 const WIDTH = 700 
 const HEIGHT = 450 
+
+var color = d3.scaleOrdinal(d3.schemeCategory10)
 
 
 
@@ -67,7 +70,7 @@ if (Summary.length > 0){
             .data(layers)
             .join("g")
             .attr("class", "layer")
-            .attr("fill", layer => colors[layer.key])
+            .attr("fill", layer => color(layer.index))
             .selectAll("rect")
             .data(layer => layer)
             .join("rect")
@@ -75,6 +78,29 @@ if (Summary.length > 0){
             .attr("width", xScale.bandwidth)
             .attr("y", sequence => yScale(sequence[1]))
             .attr("height", sequence => yScale(sequence[0]) - yScale(sequence[1]));
+
+
+          // Create the legend
+          var legend = d3.select(groupRef.current)
+          .attr("class", "legend")
+          .attr("transform", "translate(" + (WIDTH ) + "," + 20 + ")")
+          .selectAll("g")
+          .data(keys)
+          .enter().append("g")
+          .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+  
+          legend.append("rect")
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", function(d, i) { return color(i) });
+  
+          legend.append("text")
+          .attr("x", 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .attr("fill", "white" )
+          .text(function(d) { return d });
+
     })
 }
 
@@ -82,6 +108,8 @@ if (Summary.length > 0){
   return (
     <div ref={wrapperRef} style={{ marginBottom: "2rem" }}>
         <svg ref={svgRef} width="800" height="500">
+                <g ref={groupRef}>
+                </g>
             <g className="x-axis" />
             <g className="y-axis" />
             {/* <g ref={groupRef}>
