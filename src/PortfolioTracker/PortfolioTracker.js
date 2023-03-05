@@ -480,7 +480,7 @@ function PortfolioTracker() {
 
         <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-1 auto-rows-fr'>
         <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
-                {/* <ComparingStocksVis/> */}
+                <ComparingStocksVis Summary = {summary}/>
             </div>
         </div>
 
