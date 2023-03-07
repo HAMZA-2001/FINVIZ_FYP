@@ -156,9 +156,6 @@ function PieChartVis({Summary, PMS}) {
 
     useEffect(()=>{
 
-        // var arcOver = d3.arc()
-        // .outerRadius(radius + 29);
-
         var arcOver = d3.arc()
             .outerRadius(radius)
             .innerRadius(radius - 80)
@@ -185,16 +182,6 @@ function PieChartVis({Summary, PMS}) {
         console.log(d)
         console.log(Summary)
         console.log(overview)
-        // if (overview.length>0){
-        //     d.forEach((element,i)=>{
-        //         overview.forEach((overview_elm)=>{
-        //             if(element.Symbol === overview_elm.ticker){
-        //                 d[i]["PERatio"] = overview_elm.PERatio
-        //             }
-        //         })
-        //         // if (element.Symbol === )
-        //     })
-        // }
 
         var g = svg.selectAll(".arc")
             .data(pie(d))
@@ -205,9 +192,15 @@ function PieChartVis({Summary, PMS}) {
                 .attr("class", "tooltip-donut")
                 .style("opacity", 1)
                 .style("position", "absolute")
-                .style('width', "50px")
-                .style('height', "50px")
-                .attr("color", "blue")
+                .style('width', "auto")
+                .style('height', "auto")
+                .style("border-radius", "8%")
+                .style("box-shadow", "inset 0 0 12px #189AB4")
+                .style("background-color", "#05445E")
+                .style("display", "flex")
+                .style("flex-direction", "column")
+                .style("justify-content", "center")
+                
 
             var form = d3.select(contentRef.current)
 
@@ -254,14 +247,13 @@ function PieChartVis({Summary, PMS}) {
                                 <label for="html">HTML</label>
                                 <input type="radio" id="html" name="fav_language" value="HTML">`
 
-                let hoverIMG = `<img class="rounded-full h-12 w-12  object-cover" src= ${d.data.logo} alt=""/>`
-                let fill = "<h1>"+ num +"</h1>" + hoverIMG
+                let hoverIMG = `<img class="rounded-full object-cover" src= ${d.data.logo} alt=""/>`
+                let indicatortext = "<h1>" + selectValue.toUpperCase() + ": " + d.data[selectValue] +"</h1>"
+                let fill = "<h1>" + selectedData.toUpperCase() + ": " + num +"</h1>" + indicatortext + hoverIMG
                 
+                let fill2 = `<div background-color="white" height=100px>${fill}</div>`
+                console.log(event.pageX, event.pageY)
                 div.html(fill)
-                // .style("left", "350px")
-                // .style("top", "1250px")
-                // .style("width", "100%")
-                // .style("height", "100%")
                 .style("left", (event.pageX - 10) + "px")
                 .style("top", (event.pageY + 15) + "px");
                 })
@@ -499,7 +491,7 @@ function PieChartVis({Summary, PMS}) {
                         // if (element.Symbol === )
                     })
                 }
-            },500)
+            },1000)
         }
     },[Summary])
 
@@ -527,7 +519,7 @@ function PieChartVis({Summary, PMS}) {
                 aria-labelledby="demo-row-radio-buttons-group-label"
                 name="row-radio-buttons-group"
             >
-                <FormControlLabel value="marketcap" control={<Radio />} label="Target Allocation" onChange={handleInputChange.bind(this)} />
+                <FormControlLabel value="marketcap" control={<Radio />} label="RESET" onChange={handleInputChange.bind(this)} />
                 <FormControlLabel value="PERatio" control={<Radio />} label="P/E" onChange={handleInputChange.bind(this)} />
                 <FormControlLabel value="PEGRatio" control={<Radio />} label="PEG Ratio" onChange={handleInputChange.bind(this)}/>
                 <FormControlLabel value="Beta" control={<Radio />} label="Beta" onChange={handleInputChange.bind(this)}/>
@@ -543,16 +535,20 @@ function PieChartVis({Summary, PMS}) {
                 </RadioGroup>
             </FormControl>
             </div>
-            <div ref={divRef} className='bg-white' fill='blue'>
+            <div ref={divRef}>
                 {/* <button ref={contentRef} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
                     Button
                     </button> */}
             </div>
             <div className='h-full'>
-            <svg className= "pt-6" ref={svgRef} width="800" height="500">
-                <g ref={groupRef}>
-                </g>
-            </svg>
+                <svg className= "pt-6" ref={svgRef} width="800" height="500">
+                    <g ref={groupRef}>
+                    </g>
+                </svg>
+                {/* <div className='bg-white absolute top-2/4 left-12'>
+                        hello
+                </div> */}
+
             </div>
 
         </div>
