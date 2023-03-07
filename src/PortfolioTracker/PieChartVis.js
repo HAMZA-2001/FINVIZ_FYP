@@ -361,7 +361,7 @@ function PieChartVis({Summary, PMS}) {
                     if(d.data.Beta === "None"){
                         return radius -20
                     }else{
-                        return radius -20 + parseInt(d.data.Beta*5)
+                        return radius -20 + parseInt(d.data.Beta*15)
                     }
                    
                 })
