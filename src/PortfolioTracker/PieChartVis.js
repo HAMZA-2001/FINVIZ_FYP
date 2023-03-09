@@ -69,10 +69,22 @@ function PieChartVis({Summary, PMS}) {
 
             var div = d3.select(divRef.current)
             .attr("class", "tooltip-donut")
-            .style("opacity", 0)
+            .style("opacity", 1)
             .style("position", "absolute")
-            .style('width', "10px")
-            .style('height', "10px")
+            .style('width', "auto")
+            .style('height', "auto")
+            .style("border-radius", "8%")
+            .style("box-shadow", "inset 0 0 12px #189AB4")
+            .style("background-color", "#05445E")
+            .style("display", "flex")
+            .style("flex-direction", "column")
+            .style("justify-content", "center")
+            
+            // .attr("class", "tooltip-donut")
+            // .style("opacity", 0)
+            // .style("position", "absolute")
+            // .style('width', "10px")
+            // .style('height', "10px")
 
 
         g.append("path")
@@ -87,7 +99,12 @@ function PieChartVis({Summary, PMS}) {
                     .duration(50)
                     .style("opacity", "1");
                 let num =  (d.data.marketcap).toFixed(2);
-                div.html(num)
+                let hoverIMG = `<img class="rounded-full object-cover" src= ${d.data.logo} alt=""/>`
+                let indicatortext = "<h1>" + selectValue.toUpperCase() + ": " + d.data[selectValue] +"</h1>"
+                let fill = "<h1>" + selectedData.toUpperCase() + ": " + num +"</h1>" + hoverIMG
+                
+                let fill2 = `<div background-color="white" height=100px>${fill}</div>`
+                div.html(fill)
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 15) + "px");
                 })
@@ -190,7 +207,7 @@ function PieChartVis({Summary, PMS}) {
 
             var div = d3.select(divRef.current)
                 .attr("class", "tooltip-donut")
-                .style("opacity", 1)
+                .style("opacity", 0)
                 .style("position", "absolute")
                 .style('width', "auto")
                 .style('height', "auto")
@@ -253,6 +270,7 @@ function PieChartVis({Summary, PMS}) {
                 
                 let fill2 = `<div background-color="white" height=100px>${fill}</div>`
                 console.log(event.pageX, event.pageY)
+
                 div.html(fill)
                 .style("left", (event.pageX - 10) + "px")
                 .style("top", (event.pageY + 15) + "px");
@@ -519,7 +537,7 @@ function PieChartVis({Summary, PMS}) {
                 aria-labelledby="demo-row-radio-buttons-group-label"
                 name="row-radio-buttons-group"
             >
-                <FormControlLabel value="marketcap" control={<Radio />} label="RESET" onChange={handleInputChange.bind(this)} />
+                <FormControlLabel value="" control={<Radio />} label="RESET" onChange={handleInputChange.bind(this)} />
                 <FormControlLabel value="PERatio" control={<Radio />} label="P/E" onChange={handleInputChange.bind(this)} />
                 <FormControlLabel value="PEGRatio" control={<Radio />} label="PEG Ratio" onChange={handleInputChange.bind(this)}/>
                 <FormControlLabel value="Beta" control={<Radio />} label="Beta" onChange={handleInputChange.bind(this)}/>

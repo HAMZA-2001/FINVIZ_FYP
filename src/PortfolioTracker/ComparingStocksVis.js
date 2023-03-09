@@ -2,6 +2,9 @@ import React, { useRef, useState } from 'react'
 import * as d3 from "d3";
 import { convertDateToUnixTimestamp, createDate } from '../components/date-helper';
 import { useEffect } from 'react';
+import { FormControl, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
+
+
 // import {convertUnixTimestampToDate, convertDateToUnixTimestamp, createDate} from "..components/date-helper"
 
 const chartConfig = {
@@ -155,6 +158,8 @@ function ComparingStocksVis({Summary}) {
           const xdomainData = []
           const ydomainData = []
           const Extracteddata = filteredData[0]
+
+      
           for (let arrays = 0; arrays < filteredData.length; arrays++){
               for (let i = 0; i < (filteredData[arrays].values.length); i++)
                   xdomainData.push(filteredData[arrays].values[i].date)
@@ -164,8 +169,11 @@ function ComparingStocksVis({Summary}) {
               for (let i = 0; i < (filteredData[arrays].values.length); i++)
                   ydomainData.push(filteredData[arrays].values[i].y_val)
           }
-          console.log(xdomainData)
+          console.log(xdomainData.slice(100))
           console.log(Extracteddata.values)
+          
+         
+
           
               // update scales
               x.domain(d3.extent(xdomainData))
@@ -199,6 +207,7 @@ function ComparingStocksVis({Summary}) {
               g.selectAll(".line").data(filteredData).enter().append('path')
                   .transition(t)
                   .attr("fill", "none")
+                  .attr("class", "path")
                   .attr("stroke", d => colorScale(colorValue(d)))
                   .attr("stroke-width", "2.5px")
                   .attr("d", d => line(d.values))
@@ -270,9 +279,217 @@ function ComparingStocksVis({Summary}) {
         console.log(datavals)
       }
     },[datavals])
+
+
+    const [select, setselect] = useState()
+
+    function handleInputChange(event){
+      g.selectAll(".path").remove()
+      setselect(event.target.value)
+    }
     
+
+    const MARGIN = { LEFT: 100, RIGHT: 100, TOP: 50, BOTTOM: 100 }
+        const WIDTH = 1600 - MARGIN.LEFT - MARGIN.RIGHT
+        const HEIGHT = 600 - MARGIN.TOP - MARGIN.BOTTOM
+        
+          const svg = d3.select(Chart_Area.current)
+          .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+          .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+          // .style("background", 'white')
+   
+          const g = d3.select(Group_Area.current)
+          .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
+
+          const xAxis = d3.select(x_axis.current)
+          .attr("class", "x axis")
+          .attr("transform", `translate(0, ${HEIGHT})`)
+
+          const yAxis = d3.select(y_axis.current)
+          .attr("class", "y axis")
+
+          const xLabel = d3.select(x_Label.current)
+          .attr("class", "x axisLabel")
+          .attr("y", HEIGHT + 50)
+          .attr("x", WIDTH / 2)
+          .attr("font-size", "20px")
+          .attr("text-anchor", "middle")
+          .text("Years")
+
+        const yLabel = d3.select(y_Label.current)
+          .attr("class", "y axisLabel")
+          .attr("transform", "rotate(-90)")
+          .attr("y", -60)
+          .attr("x", -290)
+          .attr("font-size", "20px")
+          .attr("text-anchor", "middle")
+          .text("Closing Price")
+
+    // let dataSet = filteredData
+    
+    function showrangeGraphs(range){
+      console.log(filteredData)
+      let storefilteredData = filteredData
+      let dataSet = filteredData
+      let newarr = []
+      dataSet.forEach((item, idx)=>{
+        newarr.push(
+          {
+            "key" : item.key,
+            "values" : item.values.slice(0,range)
+          }
+        )
+        
+      })
+      // if(range===0){
+      //   console.log("hi")
+      //   console.log()
+      //   newarr = dataSet
+      // }
+      console.log(newarr)
+      // filteredData = storefilteredData
+
+      g.selectAll(".path").transition().remove()
+      if(filteredData.length>0){
+          // scales
+        const x = d3.scaleTime().range([0, WIDTH])
+        const y = d3.scaleLinear().range([HEIGHT, 0])
+
+        // axis generators
+        const xAxisCall = d3.axisBottom().ticks(10)
+        const yAxisCall = d3.axisLeft()
+                    .ticks(6)
+        const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+        if(filteredData.length>0){
+          const t = d3.transition().duration(1000)
+          // Compare with of the graphs have the greater scale bands to the domain could be adjusted accordingly
+          const xdomainData = []
+          const ydomainData = []
+          const filteredxdomaindata = []
+          const Extracteddata = newarr[0]
+          for (let arrays = 0; arrays < newarr.length; arrays++){
+              for (let i = 0; i < (newarr[arrays].values.length); i++)
+                  xdomainData.push(newarr[arrays].values[i].date)
+          }
+
+          for (let arrays = 0; arrays < newarr.length; arrays++){
+              for (let i = 0; i < (newarr[arrays].values.length); i++)
+                  ydomainData.push(newarr[arrays].values[i].y_val)
+          }
+          console.log(xdomainData)
+          console.log(Extracteddata.values)
+
+          for (let i = 0; i < (range); i++){
+            filteredxdomaindata.push(xdomainData[i])
+          }
+
+          
+              // update scales
+              x.domain(d3.extent(filteredxdomaindata))
+              y.domain([
+                  d3.min(ydomainData) / 1.005, 
+                  d3.max(ydomainData) * 1.005
+              ])
+
+              xAxisCall.scale(x)
+              xAxis.call(xAxisCall)
+              yAxisCall.scale(y)
+              yAxis.call(yAxisCall)
+
+             
+
+              // Generating Grids
+              const yGrid = yAxisCall
+                  .tickSizeInner(-WIDTH - MARGIN.LEFT + MARGIN.RIGHT ) 
+
+
+              yAxis.transition(t).call(yAxisCall)
+          
+              // Path generator
+              const line = d3.line()
+                  .x(d => x(d.date))
+                  .y(d => y(d.y_val))
+
+                  const colorValue = d=>d.key
+          
+              // Update our line path
+
+              g.selectAll(".line").data(newarr).enter().append('path')
+                  .transition(t)
+                  .attr("fill", "none")
+                  .attr("class", "path")
+                  .attr("stroke", d => colorScale(colorValue(d)))
+                  .attr("stroke-width", "2.5px")
+                  .attr("d", d => line(d.values))
+
+
+                   var color = d3.scaleOrdinal(d3.schemeCategory10)
+
+                  var legend = d3.select(groupRef.current)
+                  .attr("class", "legend")
+                  .attr("transform", "translate(" + (WIDTH + 120) + "," + 20 + ")")
+                  .selectAll("g")
+                  .data(dataSet)
+                  .enter().append("g")
+                  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+          
+                  legend.append("rect")
+                  .attr("width", 18)
+                  .attr("height", 18)
+                  .style("fill", function(d, i) { return color(i) });
+          
+                  legend.append("text")
+                  .attr("x", 24)
+                  .attr("y", 9)
+                  .attr("dy", ".35em")
+                  .attr("fill", "white" )
+                  .text(function(d) { return d.key});
+            
+                  
+      }
+      
+
+    
+      
+      }
+    }
+
+    useEffect(()=>{
+      console.log(filteredData)
+     
+    if(select==="Overall"){
+          // showrangeGraphs(0)
+      }
+      if(select==="Yearly"){
+         showrangeGraphs(52)
+      }if(select==="5Years"){
+         showrangeGraphs(260)
+      }if(select==="Monthly"){
+        showrangeGraphs(8)
+     }if(select==="oa"){
+        let nv = filteredData
+        showrangeGraphs(0)
+     }
+     
+
+    },[select])
   return (
     <div>
+    	    <div>
+            <FormControl>
+            <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+            >
+                <FormControlLabel value="" control={<Radio />} label="Clear" onChange={handleInputChange.bind(this)} />
+                <FormControlLabel value="5Years" control={<Radio />} label="5 Years" onChange={handleInputChange.bind(this)}/>
+                <FormControlLabel value="Yearly" control={<Radio />} label="1 Year" onChange={handleInputChange.bind(this)} />
+                <FormControlLabel value="Monthly" control={<Radio />} label="Monthly" onChange={handleInputChange.bind(this)}/>
+
+                </RadioGroup>
+            </FormControl>
+            </div>
     
                 <svg ref={Chart_Area} width="800" height="500">
                   <g ref={groupRef}>

@@ -23,6 +23,15 @@ const svg = d3.select(svgRef.current)
 const WIDTH = 700 
 const HEIGHT = 450 
 
+//         // Y label
+// const yLabel = d3.select(yLabel.current)
+//         .attr("class", "y axis-label")
+//         .attr("x", - (HEIGHT / 2))
+//         .attr("y", -60)
+//         .attr("font-size", "20px")
+//         .attr("text-anchor", "middle")
+//         .attr("transform", "rotate(-90)")
+
 var color = d3.scaleOrdinal(d3.schemeCategory10)
 
 const [getSummary, setSummary] = useState([])
@@ -59,6 +68,7 @@ function plotStackedBarChart(symbol){
   .select(".x-axis")
   .attr("transform", `translate(0, ${HEIGHT})`)
   .call(xAxis);
+
 
 
   const yScale = d3.scaleLinear()
