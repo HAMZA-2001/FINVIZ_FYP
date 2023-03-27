@@ -5,6 +5,8 @@ import BarChartVis from './BarChartVis';
 import ComparingStocksVis from './ComparingStocksVis';
 import PieChartVis from './PieChartVis';
 import StackedBarChart from './StackedBarChart';
+import * as xlsx from 'xlsx';
+import PurchaseScatterPlot from './PurchaseScatterPlot';
 
 function convertISODate(isodate){
     const date = new Date(isodate);
@@ -355,6 +357,15 @@ function PortfolioTracker() {
         settotalreturnSum(t3)
     },[summary])
 
+    function exportToExcel(event){
+        console.log("exporting...")
+        console.log(summary)
+        const ws = xlsx.utils.json_to_sheet(summary);
+        const wb = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb, ws, "Sheet1");
+        xlsx.writeFile(wb, "data.xlsx");
+    }
+
 
   return (
     <div>
@@ -461,11 +472,19 @@ function PortfolioTracker() {
                                             </tbody>
                                     </table>
                                 </div>
-                            
                         </div>
                     </div> 
                 </div>
+                <div class="flex justify-center">
+                <button class="h-14 w-58 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={exportToExcel.bind(this)}>
+                    Export to Excel
+                </button> 
+                </div>
+                           
             </div>
+      
+
+              
         </div>
 
         <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-2 pt-20 grid-rows-1 auto-rows-fr'>
@@ -484,11 +503,26 @@ function PortfolioTracker() {
             </div>
         </div>
 
-        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-6 auto-rows-fr'>
+        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-2 pt-20 grid-rows-1 auto-rows-fr'>
+            <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[600px] flex justify-center align-center'>
+                <StackedBarChart Summary = {summary}/>
+            </div>
+            <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
+                <PurchaseScatterPlot/>                             	
+            </div>
+            
+        </div>   
+
+        {/* <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-1 auto-rows-fr'>
         <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
                <StackedBarChart Summary = {summary}/>
             </div>
         </div>
+        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-2 auto-rows-fr'>
+        <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
+               <PurchaseScatterPlot/>
+            </div>
+        </div> */}
     
     </div>
   )
