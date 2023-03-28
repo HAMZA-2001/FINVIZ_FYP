@@ -148,7 +148,7 @@ function ComparingStocksVis({Summary}) {
         const y = d3.scaleLinear().range([HEIGHT, 0])
 
         // axis generators
-        const xAxisCall = d3.axisBottom() .ticks(6)
+        const xAxisCall = d3.axisBottom().ticks(6)
         const yAxisCall = d3.axisLeft()
                     .ticks(6)
         const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
@@ -205,7 +205,8 @@ function ComparingStocksVis({Summary}) {
           
               // Update our line path
               g.selectAll(".line").data(filteredData).enter().append('path')
-                  .transition(t)
+                  .transition()
+                  .duration(1000)
                   .attr("fill", "none")
                   .attr("class", "path")
                   .attr("stroke", d => colorScale(colorValue(d)))
@@ -284,6 +285,7 @@ function ComparingStocksVis({Summary}) {
     const [select, setselect] = useState()
 
     function handleInputChange(event){
+      const t = d3.transition().duration(1000)
       g.selectAll(".path").remove()
       setselect(event.target.value)
     }
@@ -312,18 +314,20 @@ function ComparingStocksVis({Summary}) {
           .attr("class", "x axisLabel")
           .attr("y", HEIGHT + 50)
           .attr("x", WIDTH / 2)
+          .attr("fill","white")
           .attr("font-size", "20px")
           .attr("text-anchor", "middle")
-          .text("Years")
+          .text("Time Period")
 
         const yLabel = d3.select(y_Label.current)
           .attr("class", "y axisLabel")
           .attr("transform", "rotate(-90)")
           .attr("y", -60)
-          .attr("x", -290)
+          .attr("x", -230)
+          .attr("fill","white")
           .attr("font-size", "20px")
           .attr("text-anchor", "middle")
-          .text("Closing Price")
+          .text("Closing Price ($)")
 
     // let dataSet = filteredData
     
@@ -332,22 +336,30 @@ function ComparingStocksVis({Summary}) {
       let storefilteredData = filteredData
       let dataSet = filteredData
       let newarr = []
-      dataSet.forEach((item, idx)=>{
-        newarr.push(
-          {
-            "key" : item.key,
-            "values" : item.values.slice(0,range)
-          }
-        )
-        
-      })
-      // if(range===0){
-      //   console.log("hi")
-      //   console.log()
-      //   newarr = dataSet
-      // }
+      if(range === 0){
+        dataSet.forEach((item, idx)=>{
+          newarr.push(
+            {
+              "key" : item.key,
+              "values" : item.values
+            }
+          )
+          
+        })
+      }else{
+        dataSet.forEach((item, idx)=>{
+          newarr.push(
+            {
+              "key" : item.key,
+              "values" : item.values.slice(0,range)
+            }
+          )
+          
+        })
+      }
+
       console.log(newarr)
-      // filteredData = storefilteredData
+
 
       g.selectAll(".path").transition().remove()
       if(filteredData.length>0){
@@ -386,6 +398,7 @@ function ComparingStocksVis({Summary}) {
           
               // update scales
               x.domain(d3.extent(filteredxdomaindata))
+              console.log(d3.extent(filteredxdomaindata))
               y.domain([
                   d3.min(ydomainData) / 1.005, 
                   d3.max(ydomainData) * 1.005
@@ -414,13 +427,25 @@ function ComparingStocksVis({Summary}) {
           
               // Update our line path
 
-              g.selectAll(".line").data(newarr).enter().append('path')
+              const path = g.selectAll(".line").data(newarr).enter().append('path')
                   .transition(t)
                   .attr("fill", "none")
                   .attr("class", "path")
                   .attr("stroke", d => colorScale(colorValue(d)))
                   .attr("stroke-width", "2.5px")
                   .attr("d", d => line(d.values))
+
+                  // Define clip path
+              const clip = svg.append('clipPath')
+              .attr('id', 'clip')
+              .append('rect')
+              // .attr('x', MARGIN.LEFT)
+              // .attr('y', MARGIN.TOP)
+              .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+              .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+
+              // Apply clip path to path element
+            path.attr('clip-path', 'url(#clip)');
 
 
                    var color = d3.scaleOrdinal(d3.schemeCategory10)
@@ -443,7 +468,7 @@ function ComparingStocksVis({Summary}) {
                   .attr("y", 9)
                   .attr("dy", ".35em")
                   .attr("fill", "white" )
-                  .text(function(d) { return d.key});
+                  .text(function(d) { return d.key}); 
             
                   
       }
@@ -454,22 +479,152 @@ function ComparingStocksVis({Summary}) {
       }
     }
 
+    // function showrangeGraphs(range){
+    //   console.log(filteredData)
+    //   let storefilteredData = filteredData
+    //   let dataSet = filteredData
+    //   let newarr = []
+    //   dataSet.forEach((item, idx)=>{
+    //     newarr.push(
+    //       {
+    //         "key" : item.key,
+    //         "values" : item.values.slice(0,range)
+    //       }
+    //     )
+        
+    //   })
+
+    //   console.log(newarr)
+
+
+    //   g.selectAll(".path").transition().remove()
+    //   if(filteredData.length>0){
+    //       // scales
+    //     const x = d3.scaleTime().range([0, WIDTH])
+    //     const y = d3.scaleLinear().range([HEIGHT, 0])
+
+    //     // axis generators
+    //     const xAxisCall = d3.axisBottom().ticks(10)
+    //     const yAxisCall = d3.axisLeft()
+    //                 .ticks(6)
+    //     const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+    //     if(filteredData.length>0){
+          
+    //       // Compare with of the graphs have the greater scale bands to the domain could be adjusted accordingly
+    //       const xdomainData = []
+    //       const ydomainData = []
+    //       const filteredxdomaindata = []
+    //       const Extracteddata = newarr[0]
+    //       for (let arrays = 0; arrays < newarr.length; arrays++){
+    //           for (let i = 0; i < (newarr[arrays].values.length); i++)
+    //               xdomainData.push(newarr[arrays].values[i].date)
+    //       }
+
+    //       for (let arrays = 0; arrays < newarr.length; arrays++){
+    //           for (let i = 0; i < (newarr[arrays].values.length); i++)
+    //               ydomainData.push(newarr[arrays].values[i].y_val)
+    //       }
+    //       console.log(xdomainData)
+    //       console.log(Extracteddata.values)
+
+    //       for (let i = 0; i < (range); i++){
+    //         filteredxdomaindata.push(xdomainData[i])
+    //       }
+
+    //       setTimeout(()=>{
+    //         const t = d3.transition().duration(1000)
+    //            // update scales
+    //            x.domain(d3.extent(filteredxdomaindata))
+    //            console.log(d3.extent(filteredxdomaindata))
+    //            y.domain([
+    //                d3.min(ydomainData) / 1.005, 
+    //                d3.max(ydomainData) * 1.005
+    //            ])
+ 
+    //            xAxisCall.scale(x)
+    //            xAxis.call(xAxisCall)
+    //            yAxisCall.scale(y)
+    //            yAxis.call(yAxisCall)
+ 
+              
+ 
+    //            // Generating Grids
+    //            const yGrid = yAxisCall
+    //                .tickSizeInner(-WIDTH - MARGIN.LEFT + MARGIN.RIGHT ) 
+ 
+ 
+    //            yAxis.transition(t).call(yAxisCall)
+           
+    //            // Path generator
+    //            const line = d3.line()
+    //                .x(d => x(d.date))
+    //                .y(d => y(d.y_val))
+ 
+    //                const colorValue = d=>d.key
+           
+    //            // Update our line path
+ 
+    //            g.selectAll(".line").data(newarr).enter().append('path')
+    //                .transition(t)
+    //                .attr("fill", "none")
+    //                .attr("class", "path")
+    //                .attr("stroke", d => colorScale(colorValue(d)))
+    //                .attr("stroke-width", "2.5px")
+    //                .attr("d", d => line(d.values))
+    //       }, 1000)
+             
+
+
+    //                var color = d3.scaleOrdinal(d3.schemeCategory10)
+
+    //               var legend = d3.select(groupRef.current)
+    //               .attr("class", "legend")
+    //               .attr("transform", "translate(" + (WIDTH + 120) + "," + 20 + ")")
+    //               .selectAll("g")
+    //               .data(dataSet)
+    //               .enter().append("g")
+    //               .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+          
+    //               legend.append("rect")
+    //               .attr("width", 18)
+    //               .attr("height", 18)
+    //               .style("fill", function(d, i) { return color(i) });
+          
+    //               legend.append("text")
+    //               .attr("x", 24)
+    //               .attr("y", 9)
+    //               .attr("dy", ".35em")
+    //               .attr("fill", "white" )
+    //               .text(function(d) { return d.key}); 
+            
+                  
+    //   }
+      
+
+    
+      
+    //   }
+    // }
+
     useEffect(()=>{
       console.log(filteredData)
      
-    if(select==="Overall"){
-          // showrangeGraphs(0)
-      }
+    // if(select==="Overall"){
+    //       // showrangeGraphs(0)
+    //   }
       if(select==="Yearly"){
-         showrangeGraphs(52)
+         showrangeGraphs(52) // 52 weeks
       }if(select==="5Years"){
-         showrangeGraphs(260)
+         showrangeGraphs(240)
       }if(select==="Monthly"){
         showrangeGraphs(8)
-     }if(select==="oa"){
-        let nv = filteredData
-        showrangeGraphs(0)
+     }if(select==="Overall"){
+        showrangeGraphs(1040)
      }
+    //  if(select==="oa"){
+    //     let nv = filteredData
+    //     showrangeGraphs(0)
+    //  }
      
 
     },[select])
@@ -482,7 +637,7 @@ function ComparingStocksVis({Summary}) {
                 aria-labelledby="demo-row-radio-buttons-group-label"
                 name="row-radio-buttons-group"
             >
-                <FormControlLabel value="" control={<Radio />} label="Clear" onChange={handleInputChange.bind(this)} />
+                <FormControlLabel value="Overall" control={<Radio />} label="Overall" onChange={handleInputChange.bind(this)} />
                 <FormControlLabel value="5Years" control={<Radio />} label="5 Years" onChange={handleInputChange.bind(this)}/>
                 <FormControlLabel value="Yearly" control={<Radio />} label="1 Year" onChange={handleInputChange.bind(this)} />
                 <FormControlLabel value="Monthly" control={<Radio />} label="Monthly" onChange={handleInputChange.bind(this)}/>

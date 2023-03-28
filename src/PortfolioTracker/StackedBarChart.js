@@ -17,6 +17,21 @@ let colors = {
    "strongSell": "red"
 }
 
+const divRef = useRef()
+
+var div = d3.select(divRef.current)
+  .attr("class", "tooltip-donut")
+  .style("opacity", 0)
+  .style("position", "absolute")
+  .style('width', "100px")
+  .style('height', "100px")
+  .style("background-color", "#373434")
+  .style("border-radius", "50%")
+  .style("display", "flex")
+  .style("flex-direction", "column")
+  .style("justify-content", "center")
+  .style("font-size", "20px")
+
 
 const svg = d3.select(svgRef.current)
     .attr("transform", `translate(0, ${60})`);
@@ -90,10 +105,35 @@ svg
   .join("rect")
   .attr("x", sequence => xScale(sequence.data.period))
   .attr("width", xScale.bandwidth)
+  .on("mouseover", function (event, d) {
+    console.log(d)
+    d3.select(this)
+      .transition()
+      .duration(200)
+      .attr('height', d => (HEIGHT - yScale(d[1])) )
+
+    let displayText = d[1]-d[0]
+    div.style("opacity", "1");
+    let fill = "<h1>"+ displayText + "</h1>"
+    div.html(fill)
+    .style("z-index", 2)
+    .style("left", (event.pageX + 10) + "px")
+    .style("top", (event.pageY - 15) + "px");
+
+  })
+  .on('mouseout', function (d) {
+    d3.select(this)
+      .transition()
+      .duration(200)
+      .attr('height', d => yScale(d[0]) - yScale(d[1]))
+    
+    div.style("opacity", 0);
+  })
+
   .transition()
   .attr("y", sequence => yScale(sequence[1]))
   .attr("height", sequence => yScale(sequence[0]) - yScale(sequence[1]))
-
+  
   d3.selectAll(".layer").transition().duration(500)
 
 
@@ -223,6 +263,7 @@ function getSelectedValues(event){
         
               </select>
         </div>
+        <div ref={divRef}></div>
         <svg   ref={svgRef} width="800" height="500">
                 <g ref={groupRef}>
 

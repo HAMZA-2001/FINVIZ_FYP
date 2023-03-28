@@ -24,7 +24,7 @@ function PurchaseScatterPlot() {
 
   var div = d3.select(divRef.current)
     .attr("class", "tooltip-donut")
-    .style("opacity", 1)
+    .style("opacity", 0)
     .style("position", "absolute")
     .style('width', "auto")
     .style('height', "auto")
@@ -181,13 +181,14 @@ function PurchaseScatterPlot() {
             return y(d.amount)
         })
         .attr('r', 5)
-        .attr('fill', "grey")
+        .attr('fill', "#ADD8E6")
         .on('mouseover', function (event, d) {
             console.log(d)
             console.log("hio")
             d3.select(this)
               .transition()
               .duration(200)
+              .attr('fill', "blue")
               .attr('r', 30);
     
             svg.append('text')
@@ -211,14 +212,13 @@ function PurchaseScatterPlot() {
             d3.select(this)
               .transition()
               .duration(200)
-              .attr('r', 5);
-
-              svg.select('#tooltip')
-              .remove();
-            })
-    
-
+              .attr('r', 5)
+              .attr('fill', "#ADD8E6")
+              
+            div.style("opacity", 0);
       
+            })
+           
 
 
       },[buyData])
@@ -226,6 +226,7 @@ function PurchaseScatterPlot() {
     function plotData(type){
         const t = d3.transition().duration(750)
         if(type === "Buy"){
+        yLabel.text("Bought ($)")
         const dates = buyData.map(d => new Date(d.date));
         const amounts = buyData.map(d => d.amount);
         const dateExtent = d3.extent(dates);
@@ -263,8 +264,40 @@ function PurchaseScatterPlot() {
             return y(d.amount)
         })
         .attr('r', 5)
-        .attr('fill', "grey")
+        .attr('fill', "#ADD8E6")
+        .on('mouseover', function (event, d) {
+            console.log(d)
+            console.log("hio")
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('fill', "blue")
+              .attr('r', 30);
+            
+              let showDate = d.date
+              let showAmount = d.amount
+              console.log(showDate, showAmount)
+            div.style("opacity", "1");
+                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                console.log(event.pageX)
+                div.html(fill)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 15) + "px");
+            
+          })
+          .on('mouseout', function () {
+            d3.select(this)
+              .attr('r', 5)
+              .attr('fill', "#ADD8E6")
+              
+            div.style("opacity", 0);
+      
+            })
+
+
         }else if(type === "Sell"){
+
+            yLabel.text("Sold ($)")
             const dates = sellData.map(d => new Date(d.date));
         const amounts = sellData.map(d => d.amount);
         const dateExtent = d3.extent(dates);
@@ -301,8 +334,37 @@ function PurchaseScatterPlot() {
             console.log(d)
             return y(d.amount)
         })
-        .attr('r', 5)
-        .attr('fill', "grey")
+        .attr('r', 7)
+        .attr('fill', "#90EE90")
+        .on('mouseover', function (event, d) {
+            console.log(d)
+            console.log("hio")
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('fill', "green")
+              .attr('r', 30);
+            
+              let showDate = d.date
+              let showAmount = d.amount
+              console.log(showDate, showAmount)
+            div.style("opacity", "1");
+                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                console.log(event.pageX)
+                div.html(fill)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 15) + "px");
+            
+          })
+          .on('mouseout', function () {
+            d3.select(this)
+              .attr('r', 7)
+              .attr('fill', "#90EE90")
+              
+            div.style("opacity", 0);
+      
+            })
+
         }
         
     
@@ -312,6 +374,7 @@ function PurchaseScatterPlot() {
       function actionbutton(event){
         const t = d3.transition().duration(750)
         const val = event.target.value
+        div.style("opacity", 0);
         if (val === "sell"){
             plotData("Sell")
         }else{
@@ -507,7 +570,7 @@ function PurchaseScatterPlot() {
 
 
   return (
-    <div>PurchaseScatterPlot
+    <div>
                 <div ref={divRef}>
                 </div>
                 <svg ref={Chart_Area} width="800" height="500">
