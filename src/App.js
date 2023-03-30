@@ -16,6 +16,7 @@ import UserPortfolio from './Portfolio/UserPortfolio';
 import StockPortfolioContext from './Portfolio/StockPortfolioContext';
 import * as userService from './Portfolio/constants/UserForm/userService'
 import PortfolioSummary from './PortfolioTracker/PortfolioSummary';
+import App3 from './App3';
 function App() {
   const [stockSymbol, setStockSymbol] = useState("FB")
    const [portfoliostockSymbol, setportfoliostockSymbol] = useState("")
@@ -47,7 +48,7 @@ function App() {
             <PrivateRoute>
             <div className='app__header'>
             <Header/>
-            <App2/>
+            <App3/>
           </div>
           </PrivateRoute>
           }/> 

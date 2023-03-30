@@ -65,6 +65,8 @@ function plotStackedBarChart(symbol){
   const stackGenerator = d3.stack()
   .keys(keys)
 
+  console.log(stackGenerator)
+
   const layers = stackGenerator(data);
   const extent = [0,
   d3.max(layers, layer => d3.max(layer, sequence => sequence[1]))
