@@ -252,6 +252,11 @@ function PurchaseScatterPlot() {
         .data([])
         .exit()
         .remove();
+        
+        svg.selectAll('rect')
+        .data([])
+        .exit()
+        .remove();
 
         g.selectAll('circle')
         .data(buyData)
@@ -264,14 +269,14 @@ function PurchaseScatterPlot() {
             return y(d.amount)
         })
         .attr('r', 5)
-        .attr('fill', "#ADD8E6")
+        .attr('fill', "green")
         .on('mouseover', function (event, d) {
             console.log(d)
             console.log("hio")
             d3.select(this)
               .transition()
               .duration(200)
-              .attr('fill', "blue")
+              .attr('fill', "#90ee90")
               .attr('r', 30);
             
               let showDate = d.date
@@ -288,7 +293,7 @@ function PurchaseScatterPlot() {
           .on('mouseout', function () {
             d3.select(this)
               .attr('r', 5)
-              .attr('fill', "#ADD8E6")
+              .attr('fill', "green")
               
             div.style("opacity", 0);
       
@@ -300,6 +305,7 @@ function PurchaseScatterPlot() {
             yLabel.text("Sold ($)")
             const dates = sellData.map(d => new Date(d.date));
         const amounts = sellData.map(d => d.amount);
+        console.log(dates)
         const dateExtent = d3.extent(dates);
         const amountExtent = d3.extent(amounts);
         console.log(dateExtent)
@@ -324,25 +330,101 @@ function PurchaseScatterPlot() {
         .exit()
         .remove();
 
-        g.selectAll('circle')
+        svg.selectAll('rect')
+        .data([])
+        .exit()
+        .remove();
+
+        g.selectAll('rect')
         .data(sellData)
         .enter()
-        .append('circle')
-        .attr("class", "circles")
-        .attr('cx', d => x(new Date(d.date)))
-        .attr('cy', function(d){
+        .append('rect')
+        .attr("class", "rect")
+        .attr('x', d => x(new Date(d.date)))
+        .attr('y', function(d){
             console.log(d)
             return y(d.amount)
         })
-        .attr('r', 7)
-        .attr('fill', "#90EE90")
+        .attr('width', 14)
+        .attr('height', 14)
+        .attr('fill', 'red')
         .on('mouseover', function (event, d) {
             console.log(d)
             console.log("hio")
             d3.select(this)
               .transition()
               .duration(200)
-              .attr('fill', "green")
+              .attr('fill', "#FFCCCB")
+              .attr('width', 24)
+              .attr('height', 24)
+            
+              let showDate = d.date
+              let showAmount = d.amount
+              console.log(showDate, showAmount)
+            div.style("opacity", "1");
+                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                console.log(event.pageX)
+                div.html(fill)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 15) + "px");
+            
+          })
+          .on('mouseout', function () {
+            d3.select(this)
+            .attr('width', 14)
+            .attr('height', 14)
+              .attr('fill', "red")
+              
+            div.style("opacity", 0);
+      
+            })
+
+        }else if(type === "Overall"){
+          console.log(data)
+          // Filter data to only include 'buy' and 'sell' actions
+          const buyD = buyData.filter(d => d.action === 'buy');
+          const sellD = sellData.filter(d => d.action === 'sell');
+
+          const x = d3.scaleTime()
+          .domain(d3.extent(buyData.concat(sellData), d => new Date(d.date)))
+          .range([0, WIDTH])
+
+          const y = d3.scaleLinear()
+              .domain([0, d3.max(buyData.concat(sellData), d => d.amount)])
+              .range([HEIGHT, 0])
+
+              console.log(buyData.concat(sellData))
+          
+          const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat('%d-%b-%Y')).ticks(4);
+          xAxisGroup.transition(t).call(xAxis)
+          const yAxis = d3.axisLeft(y)
+          yAxisGroup.transition(t).call(yAxis)
+
+          svg.selectAll('circle')
+          .data([])
+          .exit()
+          .remove();
+
+          svg.selectAll('rect')
+          .data([])
+          .exit()
+          .remove();
+
+          // Append circles for 'buy' actions
+          g.selectAll('circle')
+          .data(buyData)
+          .enter()
+          .append('circle')
+          .attr('cx', d => x(new Date(d.date)))
+          .attr('cy', d => y(d.amount))
+          .attr('r', 5)
+          .attr('fill', 'green').on('mouseover', function (event, d) {
+            console.log(d)
+            console.log("hio")
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('fill', "#90ee90")
               .attr('r', 30);
             
               let showDate = d.date
@@ -358,17 +440,103 @@ function PurchaseScatterPlot() {
           })
           .on('mouseout', function () {
             d3.select(this)
-              .attr('r', 7)
-              .attr('fill', "#90EE90")
+              .attr('r', 5)
+              .attr('fill', "green")
               
             div.style("opacity", 0);
       
             })
 
-        }
+          ;
+
+          // Append squares for 'sell' actions
+          g.selectAll('rect')
+          .data(sellData)
+          .enter()
+          .append('rect')
+          .attr('x', d => x(new Date(d.date)) - 5)
+          .attr('y', d => y(d.amount) - 5)
+          .attr('width', 10)
+          .attr('height', 10)
+          .attr('fill', 'red').on('mouseover', function (event, d) {
+            console.log(d)
+            console.log("hio")
+            d3.select(this)
+              .transition()
+              .duration(200)
+              .attr('fill', "#FFCCCB")
+              .attr('width', 24)
+              .attr('height', 24)
+            
+              let showDate = d.date
+              let showAmount = d.amount
+              console.log(showDate, showAmount)
+            div.style("opacity", "1");
+                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                console.log(event.pageX)
+                div.html(fill)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 15) + "px");
+            
+          })
+          .on('mouseout', function () {
+            d3.select(this)
+            .attr('width', 10)
+            .attr('height', 10)
+              .attr('fill', "red")
+              
+            div.style("opacity", 0);
+      
+            });
+            }
         
     
     }
+
+    // function plotoverallData(){
+    //   console.log("hee")
+    //   console.log(data)
+    //   const t = d3.transition().duration(750)
+    //   svg.selectAll('circle')
+    //   .data([])
+    //   .exit()
+    //   .remove();
+
+    //   const xScale = d3
+    //   .scaleTime()
+    //   .domain(d3.extent(data, (d) => new Date(d.date)))
+    //   .range([0, WIDTH]);
+
+    //   const yScale = d3
+    //   .scaleLinear()
+    //   .domain(d3.extent(data, (d) => d.amount))
+    //   .range([HEIGHT, 0]);
+
+    //   const colorScale = d3
+    //   .scaleOrdinal()
+    //   .domain(["buy", "sell"])
+    //   .range(["#1f77b4", "#d62728"]);
+
+    //   const shapeScale = d3
+    //   .scaleOrdinal()
+    //   .domain(["buy", "sell"])
+    //   .range([d3.symbol().type(d3.symbolCircle), d3.symbol().type(d3.symbolSquare)]);
+
+    //   const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat('%Y-%b-%d')).ticks(4);
+    //   xAxisGroup.transition(t).call(xAxis)
+    //   const yAxis = d3.axisLeft(yScale)
+    //   yAxisGroup.transition(t).call(yAxis)
+
+    //   svg
+    //   .selectAll(".point")
+    //   .data(data)
+    //   .join("path")
+    //   .attr("class", "point")
+    //   .attr("fill", (d) => colorScale(d.action))
+    //   .attr("d", (d) => shapeScale(d.action).size(64)())
+    //   .attr("transform", (d) => `translate(${xScale(new Date(d.date))},${yScale(d.amount)})`);
+
+    // }
 
       const [action, setaction] = useState("buy")
       function actionbutton(event){
@@ -377,9 +545,12 @@ function PurchaseScatterPlot() {
         div.style("opacity", 0);
         if (val === "sell"){
             plotData("Sell")
-        }else{
+        }else if(val === "buy"){
             plotData("Buy")
+        }else{
+           plotData("Overall")
         }
+
 
             // plotData("Sell")
         //     if(val === "sell"){
@@ -601,8 +772,9 @@ function PurchaseScatterPlot() {
                 name="row-radio-buttons-group"
                 defaultValue="buy"
             >
-                <FormControlLabel value="buy" control={<Radio />} label="Buy" onChange={actionbutton.bind(this)} />
-                <FormControlLabel value="sell" control={<Radio />} label="Sell" onChange={actionbutton.bind(this)} />
+                <FormControlLabel value="overall" control={<Radio />} label="Overall History" onChange={actionbutton.bind(this)} />
+                <FormControlLabel value="buy" control={<Radio />} label="Purchase History" onChange={actionbutton.bind(this)} />
+                <FormControlLabel value="sell" control={<Radio />} label="Sold History" onChange={actionbutton.bind(this)} />
                 </RadioGroup>
             </FormControl>
             </div>
