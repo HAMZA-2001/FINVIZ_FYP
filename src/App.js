@@ -17,6 +17,7 @@ import StockPortfolioContext from './Portfolio/StockPortfolioContext';
 import * as userService from './Portfolio/constants/UserForm/userService'
 import PortfolioSummary from './PortfolioTracker/PortfolioSummary';
 import App3 from './App3';
+import MachineLearningModel from './MachineLearning/MachineLearningModel';
 function App() {
   const [stockSymbol, setStockSymbol] = useState("FB")
    const [portfoliostockSymbol, setportfoliostockSymbol] = useState("")
@@ -53,11 +54,11 @@ function App() {
           </PrivateRoute>
           }/> 
 
-        <Route path="/userprofile" element={
+        <Route path="/ml" element={
             <PrivateRoute>
             <div className='app__header'>
             <Header/>
-            <UserProfile/>
+            <MachineLearningModel/>
           </div>
           </PrivateRoute>
           }/> 
