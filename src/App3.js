@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from "d3";
 import { dsvFormat, scaleOrdinal, select, zoomTransform } from 'd3';
+import { dark } from '@material-ui/core/styles/createPalette';
 
 
 function App3() {
@@ -217,28 +218,41 @@ function App3() {
     //Volume barchart
     const volx_axis = useRef()
     const voly_axis = useRef()
-
+    const VOL_MARGIN = { LEFT: 100, RIGHT: 100, TOP: 50, BOTTOM: 100 }
+    const VOL_WIDTH = 1900 - MARGIN.LEFT - MARGIN.RIGHT
+    const VOL_HEIGHT = 900 - MARGIN.TOP - MARGIN.BOTTOM
     const volumeSvg = d3.select(volume_Svg.current).attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
     .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
-    .style("background", '#FCFBF4')
     .style("border-radius", '50px')
     .attr("overflow", "hidden")
+    .attr("overflow", "hidden")
+    var volclip = volumeSvg.append("clipPath")
+    .attr("id", "clip2")
+    .append("rect")
+    .attr("width", WIDTH)
+    .attr("height", HEIGHT)
     const volumegroup = d3.select(Volume_Area.current);
+
+    
 
     const volxAxisCall = d3.axisBottom();
     const volyAxisCall = d3.axisLeft();
 
         // axis groups
-    const volxAxis = d3.select(volx_axis.current).style("background","white")
+    const volxAxis = d3.select(volx_axis.current)
         .attr("class", "volx axis")
         .attr("transform", `translate(0, ${HEIGHT})`)
 
 
-    const volyAxis = d3.select(voly_axis.current).style("background","white")
+
+    const volyAxis = d3.select(voly_axis.current)
         .attr("class", "voly axis")  // set axis tick labels to white
 
- 
+      
+        
 
+ 
+  let prevVal = 0
 
     useEffect(() => {
         const dataTimeFiltered = data
@@ -249,6 +263,7 @@ function App3() {
         const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(dataTimeFiltered.map(d => d.key))
             if(dataTimeFiltered.length>0){
+               
                 const t = d3.transition().duration(1000)
                 // Compare with of the graphs have the greater scale bands to the domain could be adjusted accordingly
                 const xdomainData = []
@@ -278,8 +293,8 @@ function App3() {
                 xAxis.transition(t).call(xAxisCall)
                 yAxisCall.scale(y)
 
-                const volx = d3.scaleTime().range([0, WIDTH])
-                const voly = d3.scaleLinear().range([HEIGHT, 0])
+                const volx = d3.scaleTime().range([0, VOL_WIDTH])
+                const voly = d3.scaleLinear().range([VOL_HEIGHT, 0])
                 console.log(selectedValue)
                 if(selectedValue !== "volume"){
                     console.log(selectedValue)
@@ -364,6 +379,12 @@ function App3() {
                     //     .data(data[0].values, d => d.date)
 
                     let vt = d3.transition().duration(750)
+                    // Assuming your data is stored in a variable called `data`
+                    // x
+                    volg.selectAll(".tick line")
+                    .style("stroke", "white");
+                    volg.selectAll(".tick text")
+                    .style("fill", "white");
                     // rects.enter().append("rect")
                     //         .attr("fill", "red")
                     //         .attr("class", "rect")
@@ -380,12 +401,27 @@ function App3() {
                             
                     //         .attr("height", d => HEIGHT-d.y_val)
                     // Remove existing bars
-                    console.log(volumeData)
+                    console.log(volumeData[0].values[0].y_val)
                         volg.selectAll('.rectbars').remove();
                         volg.selectAll('rect')
                         .data(volumeData)
                         .join('g')
-                        .attr('fill', 'steelblue')
+                        // .attr('fill', (d, i) => {
+                        //     console.log(d)
+                        //     if (i > 0) {
+                        //       const diff = d.y_val - data[i - 1].y_val;
+                        //       console.log(diff)
+                        //       if (diff > 200000) {
+                        //         return 'darkgreen';
+                        //       } else if (diff >= 0) {
+                        //         return 'lightgreen';
+                        //       } else if (diff < 0){
+                        //         return 'darkred';
+                        //       }
+                        //     } else {
+                        //       return 'lightgreen';
+                        //     }
+                        //   })
                         .selectAll('rect')
                         .data(d => d.values)
                         .join('rect')
@@ -393,7 +429,53 @@ function App3() {
                         .attr('x', d => volx(d.date))
                         .attr('y', d => voly(d.y_val))
                         .attr('height', d => voly(0) - voly(d.y_val))
-                        .attr('width', 5);
+                        .attr('width', 10)
+                        .attr('fill', (d, i) => {
+        
+                            if (i+1 < volumeData[0].values.length) {
+                                console.log(volumeData[0].values[i+1].y_val)
+                                console.log(d.y_val)
+                              const diff = d.y_val - volumeData[0].values[i+1].y_val
+                            //   prevVal = d.y_val
+                              
+                              if (diff > 20000000) {
+                                return 'darkgreen';
+                              } 
+                              else if(diff < 20000000 & diff>=0){
+                                return 'lightgreen'
+                              }
+                              else if (diff < 0 & diff >= -20000000){
+                                return '#FF4F4B';
+                              }
+                              else{
+                                return 'darkred'
+                              }
+                            } 
+
+                           
+                          }).attr("clip-path", "url(#clip2)")
+                        // .attr('fill', (d, i) => {
+        
+                        //     if (i > 0 & i < volumeData[0].values.length) {
+                        //         const l = volumeData[0].values.length
+                        //         console.log(volumeData[0].values[i-1].y_val)
+                        //         console.log(d.y_val)
+                        //       const diff = d.y_val - volumeData[0].values[i-1].y_val
+                        //       prevVal = d.y_val
+                              
+                        //       if (diff > 0) {
+                        //         return 'darkgreen';
+                        //       } 
+                        //     //   else if(diff < 20000000 & diff>=0){
+                        //     //     return 'lightgreen'
+                        //     //   }
+                        //       else if (diff < 0){
+                        //         return 'darkred';
+                        //       }
+                        //     } 
+
+                           
+                        //   })
 
                         
             }
@@ -414,6 +496,7 @@ function App3() {
         svg.call(zoomBehaviour)
 
         d3.select("path").attr("clip-path", "url(#clip)");
+        d3.select("rect").attr("clip-path", "url(#clip2)");
 
         console.log(volumeData)
 
