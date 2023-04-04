@@ -33,7 +33,8 @@ function Header() {
             <a href='http://localhost:3000/viz'>Visualization</a>
             <a href='http://localhost:3000/portfolio'>Profolio</a>
             <a href='http://localhost:3000/tracker'>Tracker</a>
-            <a href='http://localhost:3000/ml'>Machine Learning</a>
+            <a href='http://localhost:3000/analysis'>Analysis</a>
+            <a href='http://localhost:3000/ml'>Prediction</a>
             <button onClick = {handleLogout.bind(this)} className='btn text-white bg-sky-900 text-md pt-1 pb-1 pr-2 pl-2 ml-2 rounded hover:bg-blue-700 focus:outline-none' >Log Out {currentUser.email}</button>
         </div>
         {/* {logo} */}
