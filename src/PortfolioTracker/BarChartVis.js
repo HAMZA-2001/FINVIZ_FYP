@@ -164,14 +164,6 @@ function BarChartVis({Summary, PMS}) {
                 const rects = g.selectAll("rect")
                   .data(data, d => d.Symbol)
               
-                // // EXIT old elements not present in new data.
-                // rects.exit()
-                //   .attr("fill", "red")
-                //   .transition(t)
-                //     .attr("height", 0)
-                //     .attr("y", y(0))
-                //     .remove()
-              
                 // ENTER new elements present in new data...
                 rects.enter().append("rect")
                   .attr("fill", "grey")

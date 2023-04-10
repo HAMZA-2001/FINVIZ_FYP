@@ -80,9 +80,6 @@ function AnalysisPage() {
           detailsfortable2["Total Sales"] = totalSale
           detailsfortable2["Total Bought"] = totalInvestment
 
-        //   console.log(detailsfortable2)
-        //   console.log(`Total sale: ${totalSale}`);
-        //   console.log(`Total Bought: ${totalInvestment}`);
 
           
           // Calculate the total amount gained or lost for each stock
@@ -164,32 +161,6 @@ data.sort((a, b) => {
   const idx = data.findIndex(item => item.action === "buy"); 
 const newArr = data.slice(idx);
 console.log(newArr)
-// newArr.forEach((transaction,i) => {
-//   if (transaction.action === "buy") {
-//     if (!holdingPeriods[transaction.ticker]) {
-//       holdingPeriods[transaction.ticker] = [];
-//     }
-//     holdingPeriods[transaction.ticker].push(transaction.date);
-//     console.log(holdingPeriods)
-//   } else {
-    
-//     const tickerHoldingPeriods = holdingPeriods[transaction.ticker];
-//     console.log(tickerHoldingPeriods)
-//     const holdingPeriod =
-//       (new Date(transaction.date) - new Date(tickerHoldingPeriods[0])) /
-//       (transaction.shares * 24 * 60 * 60 * 1000);
-//     console.log(
-//       `Average holding period for ${transaction.ticker}: ${holdingPeriod.toFixed(
-//         2
-//       )} days`
-//     );
-//     soldPeriods[transaction.ticker] = `${holdingPeriod.toFixed(2)} days`
-//     holdingPeriods[transaction.ticker] = tickerHoldingPeriods.slice(1);
-//   }});
-
-
-
- 
 
   // Initialize an object to track the holdings for each stock
 const holdings = {}
