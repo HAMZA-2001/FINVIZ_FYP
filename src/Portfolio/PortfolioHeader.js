@@ -24,26 +24,24 @@ function PortfolioHeader({symbol, price, name}) {
     // }, [])
     
   return (
-    <div className='header_container flex flex-col'>
-        <div className='flex-col text-xl items-center'>
+    <div className='header_container flex flex-col justify-center'>
+    <div>
+        <div className='flex-col text-xl items-center justify-center'>
             <h1 className='header_contents flex justify-start text-xl ml-3 mt-3 content-center pb-6'>Portfolio Management System</h1>
         </div>
-        
 
+        
         <div className='flex flex-row justify-center mb-4'>
-            <div className='flex flex-col pr-10'>
-                <div className='text-3xl'>Todays Gain</div>
-                <div className='text-3xl'>{name}</div>
-                <h3>{price}(+3.00%)</h3>
-            </div>
+
             <div className='flex flex-col pr-10'>   
                 <StockSearch/>
             </div>
-            <div className='flex flex-col pr-10'>
-                <div className='text-3xl '>Todays Value</div>
-                <h3>$5,344</h3>
-            </div>
+
         </div>   
+    </div>
+
+        
+
     </div>
 
   )

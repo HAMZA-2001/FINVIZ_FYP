@@ -83,9 +83,7 @@ function UserPortfolio() {
     <div className='m-3 row-span-5 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
         <PortfolioTable/>
     </div>
-    <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
-    	Total
-    </div>
+
 </div>
   )
 }

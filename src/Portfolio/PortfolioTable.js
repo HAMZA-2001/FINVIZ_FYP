@@ -101,17 +101,25 @@ useEffect(()=>{
                     let arr = []
                     try {
                         let result1 = await fetchStockDetails(project.portfoliostockSymbol)
+                        console.log(result1)
                         arr.push(result1)
     
                     } catch (error) {
+                        let notfound = {'country':'-', "currency":"-", "estimateCurrency":"-", "exchange":"-", "finnhubIndustry":"-", "ipo":"-", "logo": "-", "marketCapitalization": 0, "name": "-",
+                                        "phone":"00000", "shareOutstanding": 0, "ticker":"-", "weburl":"-"}
+
+                        arr.push(notfound)
                         console.log(error)
                     }
     
                     try {
                         let result2 = await fetchQuote(project.portfoliostockSymbol)
+                        console.log(result2)
                         arr.push(result2)
             
                     } catch (error) {
+                        let notfound2 = {"c":0, "d":0, "dp":0, "h":0, "l":0, "o":0, "pc":0, "t":0}
+                        arr.push(notfound2)
                         console.log(error)
                     }
     
@@ -340,18 +348,6 @@ const [clicksearch, setclicksearch] = useState(false)
             
         }
 
-        // for(let i=0; i<alldetails.length; i++){
-        //     for (let j=0; j< Results.length; j++){
-        //         console.log(j)
-        //         if(i === Results[j].id){
-        //             console.log(alldetails[i][0].ticker)
-        //            storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])
-                    
-        //         }
-        //     }
-
-            
-        // }
         console.log(Results)
 
         
@@ -359,34 +355,6 @@ const [clicksearch, setclicksearch] = useState(false)
         localStorage.clear()
     }, [Results])
 
-    const [projects, setProjects] = useState([]);
-
-    const [usersdata, setusersdata] = useState([])
-
-    async function pastData(item){
-        let arr = []
-        // let tic = (tic).toString()
-        try {
-            let result1 = await fetchStockDetails(item)
-            arr.push(result1)
-    
-        } catch (error) {
-            console.log(error)
-        }
-    
-        try {
-            let result2 = await fetchQuote(item)
-            arr.push(result2)
-    
-        } catch (error) {
-            console.log(error)
-        }
-    
-        if (arr.length>0) {
-            return arr
-
-        }
-    }
 
  
 
@@ -395,16 +363,6 @@ const [clicksearch, setclicksearch] = useState(false)
     
     useEffect(() => {
 
-        // projects.map((item  )=>{
-        //     console.log(item.portfoliostockSymbol)
-        // })
-
-            // const db = getDatabase()
-            // const reference = ref(db, 'users/' + currentUser.uid)
-            // set(reference, {
-            //     tickerList : tickerSymbols,
-            //     details : alldetails
-            //  })
 
             const db = getDatabase()
             const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
@@ -417,18 +375,7 @@ const [clicksearch, setclicksearch] = useState(false)
                 });
             }
 
-        
-            // const db = getDatabase()
-            // const query = ref(db, 'users/' + currentUser.uid)
-            // return onValue(query, (snapshot) => {
-            //     const data = snapshot.val();
-            //     console.log(data)
-            //     if (snapshot.exists()) {
-            //       Object.values(data).map((project) => {
-            //         setProjects((projects) => [...projects, project]);
-            //       });
-            //     }
-            //   });
+    
       
         console.log(alldetails)
      
@@ -462,11 +409,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         setclicksearch(true)
                     }
                     
-                    // if(alldetails.length >= 1) {
-                    //     // alldetails.push()
-                    //     co
-                    //     setalldetails(current => [...current, arr])
-                    // }
                     if (alldetails.length>0){
                         console.log(alldetails)
                         alldetails.map((items)=>{
@@ -479,18 +421,10 @@ const [clicksearch, setclicksearch] = useState(false)
                         () => {
                             console.log(alldetails)
                             console.log(alldetails.length)
-                            setalldetails([...alldetails, arr])
-                            // if (alldetails.length===1){
-                            //     console.log("here")
-                            //     setalldetails([...alldetails, arr])
-                            // }else{
-                            //     setalldetails(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
-                            //     setalldetails([...alldetails, arr])
-                            // }
-                 
+                            setalldetails([...alldetails, arr])         
                             console.log(alldetails)
                             console.log(alldetails.length)
-                        //    console.log(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
+
         
                         },
                         2000
@@ -632,9 +566,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         {console.log(count)}
 
 
-                        {console.log("clicked search is " + clickedsearch)}
-                        {console.log("clicked stock is " + clickedstock)}
-                        {clickedsearch && console.log(count)}
 
                         { (count === 0) && alldetails.slice(1).map((item, index) => {
                             console.log(item)
@@ -698,7 +629,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
                        
                         { (clickedstock===true & count>0)&&alldetails.slice(0,count).map((item, index) => {
-                            console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
                             <td class="p-3">
@@ -713,7 +643,7 @@ const [clicksearch, setclicksearch] = useState(false)
                             <td class="p-3">
                                 <div class="flex align-items-center">
                                     <div class="ml-3">
-                                        <div class="">{(item[1].pc)}</div> 
+                                        <div class="">{(item[1].pc === undefined) ? 0 : item[1].pc}</div> 
                                         <div class="text-gray-500">Post 258.20</div>
                                     </div>
                                 </div>
@@ -759,7 +689,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
 
                         {(clickedstock===true & count>0) && alldetails.slice(2*count+1).map((item, index) => {
-                            console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
                             <td class="p-3">
@@ -774,8 +703,7 @@ const [clicksearch, setclicksearch] = useState(false)
                             <td class="p-3">
                                 <div class="flex align-items-center">
                                     <div class="ml-3">
-                                        <div class="">{(item[1].pc)}</div> 
-                                        {/* {(quote[index].pc)} */}
+                                        <div class="">{(item[1].pc === undefined) ? 0 : item[1].pc}</div> 
                                         <div class="text-gray-500">Post 258.20</div>
                                     </div>
                                 </div>
@@ -821,7 +749,6 @@ const [clicksearch, setclicksearch] = useState(false)
                         }
                         
                         { (clickedstock===false & count>0)&&alldetails.map((item, index) => {
-                            console.log(item)
                             return (
                                 <tr class="bg-gray-800" key={index}>
                             <td class="p-3">
@@ -836,7 +763,7 @@ const [clicksearch, setclicksearch] = useState(false)
                             <td class="p-3">
                                 <div class="flex align-items-center">
                                     <div class="ml-3">
-                                        <div class="">{(item[1].pc)}</div> 
+                                        <div class="">{(item[1].pc === undefined) ? 0 : item[1].pc}</div> 
                                         <div class="text-gray-500">Post 258.20</div>
                                     </div>
                                 </div>
