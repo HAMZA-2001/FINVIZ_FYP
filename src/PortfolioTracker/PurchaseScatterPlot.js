@@ -103,8 +103,6 @@ function PurchaseScatterPlot() {
       .attr("fill","white")
       .attr("font-size", "20px")
       .attr("text-anchor", "middle")
-      .text("Bought")
-
 
       useEffect((()=>{
         console.log(data)
@@ -136,16 +134,13 @@ function PurchaseScatterPlot() {
             setbuyData(buyList)
             setsellData(sellList)
         },1000)
-
-        // console.log(dateObj)
-        // console.log(dateObj.length)
-
         
         
       }), [data])
 
 
 
+      // first transition when the program starts
       useEffect(()=>{
 
         const dates = buyData.map(d => new Date(d.date));
@@ -154,76 +149,182 @@ function PurchaseScatterPlot() {
         const amountExtent = d3.extent(amounts);
         console.log(dateExtent)
         console.log(amountExtent)
+        yLabel.text("Total Activity ($)")
 
         const x = d3.scaleTime()
-            .domain(dateExtent) // <-- convert date string to Date object
-            .range([0, WIDTH])
+        .domain(d3.extent(buyData.concat(sellData), d => new Date(d.date)))
+        .range([0, WIDTH])
 
         const y = d3.scaleLinear()
-            .domain(amountExtent)
+            .domain([0, d3.max(buyData.concat(sellData), d => d.amount)])
             .range([HEIGHT, 0])
 
+            console.log(buyData.concat(sellData))
         
         const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat('%d-%b-%Y')).ticks(4);
         xAxisGroup.transition(t).call(xAxis)
         const yAxis = d3.axisLeft(y)
         yAxisGroup.transition(t).call(yAxis)
 
+        svg.selectAll('circle')
+        .data([])
+        .exit()
+        .remove();
 
+        svg.selectAll('rect')
+        .data([])
+        .exit()
+        .remove();
+
+        // Append circles for 'buy' actions
         g.selectAll('circle')
         .data(buyData)
         .enter()
         .append('circle')
-        .attr("class", "circles")
         .attr('cx', d => x(new Date(d.date)))
-        .attr('cy', function(d){
-            console.log(d)
-            return y(d.amount)
-        })
+        .attr('cy', d => y(d.amount))
         .attr('r', 5)
-        .attr('fill', "#ADD8E6")
-        .on('mouseover', function (event, d) {
-            console.log(d)
-            console.log("hio")
-            d3.select(this)
-              .transition()
-              .duration(200)
-              .attr('fill', "blue")
-              .attr('r', 30);
+        .attr('fill', 'green').on('mouseover', function (event, d) {
+          console.log(d)
+          console.log("hio")
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr('fill', "#90ee90")
+            .attr('r', 30);
+          
+            let showDate = d.date
+            let showAmount = d.amount
+            console.log(showDate, showAmount)
+          div.style("opacity", "1");
+              let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+              console.log(event.pageX)
+              div.html(fill)
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 15) + "px");
+          
+        })
+        .on('mouseout', function () {
+          d3.select(this)
+            .attr('r', 5)
+            .attr('fill', "green")
+            
+          div.style("opacity", 0);
     
-            svg.append('text')
-              .attr('id', 'tooltip')
-              .attr('x', event.pageX + 10)
-              .attr('y', event.pageY - 10)
-              .text(`Date: ${d.date}, Amount: ${d.amount}`);
-            
-              let showDate = d.date
-              let showAmount = d.amount
-              console.log(showDate, showAmount)
-            div.transition().style("opacity", "1");
-                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
-                console.log(event.pageX)
-                div.html(fill)
-                .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 15) + "px");
-            
           })
-          .on('mouseout', function () {
-            d3.select(this)
-              .transition()
-              .duration(200)
-              .attr('r', 5)
-              .attr('fill', "#ADD8E6")
+
+        ;
+
+        // Append squares for 'sell' actions
+        g.selectAll('rect')
+        .data(sellData)
+        .enter()
+        .append('rect')
+        .attr('x', d => x(new Date(d.date)) - 5)
+        .attr('y', d => y(d.amount) - 5)
+        .attr('width', 10)
+        .attr('height', 10)
+        .attr('fill', 'red').on('mouseover', function (event, d) {
+          console.log(d)
+          console.log("hio")
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr('fill', "#FFCCCB")
+            .attr('width', 24)
+            .attr('height', 24)
+          
+            let showDate = d.date
+            let showAmount = d.amount
+            console.log(showDate, showAmount)
+          div.style("opacity", "1");
+              let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+              console.log(event.pageX)
+              div.html(fill)
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 15) + "px");
+          
+        })
+        .on('mouseout', function () {
+          d3.select(this)
+          .attr('width', 10)
+          .attr('height', 10)
+            .attr('fill', "red")
+            
+          div.style("opacity", 0);
+    
+          });
+
+        // const x = d3.scaleTime()
+        //     .domain(dateExtent) // <-- convert date string to Date object
+        //     .range([0, WIDTH])
+
+        // const y = d3.scaleLinear()
+        //     .domain(amountExtent)
+        //     .range([HEIGHT, 0])
+
+        
+        // const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat('%d-%b-%Y')).ticks(4);
+        // xAxisGroup.transition(t).call(xAxis)
+        // const yAxis = d3.axisLeft(y)
+        // yAxisGroup.transition(t).call(yAxis)
+
+
+        // g.selectAll('circle')
+        // .data(buyData)
+        // .enter()
+        // .append('circle')
+        // .attr("class", "circles")
+        // .attr('cx', d => x(new Date(d.date)))
+        // .attr('cy', function(d){
+        //     console.log(d)
+        //     return y(d.amount)
+        // })
+        // .attr('r', 5)
+        // .attr('fill', "#ADD8E6")
+        // .on('mouseover', function (event, d) {
+        //     console.log(d)
+        //     console.log("hio")
+        //     d3.select(this)
+        //       .transition()
+        //       .duration(200)
+        //       .attr('fill', "blue")
+        //       .attr('r', 30);
+    
+        //     svg.append('text')
+        //       .attr('id', 'tooltip')
+        //       .attr('x', event.pageX + 10)
+        //       .attr('y', event.pageY - 10)
+        //       .text(`Date: ${d.date}, Amount: ${d.amount}`);
+            
+        //       let showDate = d.date
+        //       let showAmount = d.amount
+        //       console.log(showDate, showAmount)
+        //     div.transition().style("opacity", "1");
+        //         let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+        //         console.log(event.pageX)
+        //         div.html(fill)
+        //         .style("left", (event.pageX + 10) + "px")
+        //         .style("top", (event.pageY - 15) + "px");
+            
+        //   })
+        //   .on('mouseout', function () {
+        //     d3.select(this)
+        //       .transition()
+        //       .duration(200)
+        //       .attr('r', 5)
+        //       .attr('fill', "#ADD8E6")
               
-            div.style("opacity", 0);
+        //     div.style("opacity", 0);
       
-            })
+        //     })
            
 
 
       },[buyData])
       
     function plotData(type){
+       yLabel.text("Bought ($)")
         const t = d3.transition().duration(750)
         if(type === "Buy"){
         yLabel.text("Bought ($)")
@@ -301,7 +402,6 @@ function PurchaseScatterPlot() {
 
 
         }else if(type === "Sell"){
-
             yLabel.text("Sold ($)")
             const dates = sellData.map(d => new Date(d.date));
         const amounts = sellData.map(d => d.amount);
@@ -380,6 +480,7 @@ function PurchaseScatterPlot() {
             })
 
         }else if(type === "Overall"){
+          yLabel.text("Total Activity ($)")
           console.log(data)
           // Filter data to only include 'buy' and 'sell' actions
           const buyD = buyData.filter(d => d.action === 'buy');
@@ -748,29 +849,20 @@ function PurchaseScatterPlot() {
                   <g ref={groupRef}>
                   </g>
                     <g ref={Group_Area}  >
-                    <text class="y axisLabel" ref={y_Label}>Open</text> 
-                    <text class="x axisLabel" ref={x_Label}>Years</text>
+                    <text class="y axisLabel" ref={y_Label}></text> 
+                    <text class="x axisLabel" ref={x_Label}></text>
                     <g class="x axis" ref={x_axis}></g>
                     <g class="x axis" ref={y_axis}></g>
                     <g class="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"></g>
                     </g>
-                {/* <g class="line path"></g> */}
                 </svg>
-                {/* <div class="inline-flex">
-                    <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l" onClick={actionbutton.bind(this)} value="buy">
-                        Bought
-                    </button>
-                    <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r" onClick={actionbutton.bind(this)} value="sell">
-                        Sold
-                    </button>
-                    </div> */}
                     <div>
             <FormControl>
             <RadioGroup
                 column
                 aria-labelledby="demo-row-radio-buttons-group-label"
                 name="row-radio-buttons-group"
-                defaultValue="buy"
+                defaultValue="overall"
             >
                 <FormControlLabel value="overall" control={<Radio />} label="Overall History" onChange={actionbutton.bind(this)} />
                 <FormControlLabel value="buy" control={<Radio />} label="Purchase History" onChange={actionbutton.bind(this)} />

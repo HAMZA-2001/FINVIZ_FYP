@@ -94,12 +94,13 @@ function PortfolioTracker() {
                             console.log(stock)
                             console.log(j)
                             console.log(stockArray[i])
-                            console.log(stockArray[j])
+                            console.log(stockArray[j].Total_Cost)
+                            // console.log()
                             //combination logic goes here
                             
                             stockArray[j].Total_Shares =  parseInt(stockArray[j].Total_Shares) + parseInt(item.details.Shares)
                             stockArray[j].Total_Cost =  parseInt(stockArray[j].Total_Cost) + parseInt(item.details.AverageCostPerShare * item.details.Shares)
-                            stockArray[j].AverageCostPerShare =  parseInt(stockArray[j].Total_Cost) / parseInt(stockArray[j].Total_Shares)
+                            stockArray[j].AverageCostPerShare =  (parseInt(stockArray[j].Total_Shares) === 0)? 0 : parseInt(stockArray[j].Total_Cost) / parseInt(stockArray[j].Total_Shares)
                             
                             // filtering the dates for the object 
                             let datesList = []
@@ -166,7 +167,7 @@ function PortfolioTracker() {
                                         "First_Buy_Date": buyorsell[0],
                                         "Last_Buy_Date" : buyorsell[0],
                                         "Last_Sell_Date" : buyorsell[1],
-                                        "AverageCostPerShare" : (item.details.Shares * item.details.AverageCostPerShare)/item.details.Shares
+                                        "AverageCostPerShare" : parseFloat(item.details.AverageCostPerShare)
                                     })
                 }
             }          
@@ -512,17 +513,6 @@ function PortfolioTracker() {
             </div>
             
         </div>   
-
-        {/* <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-1 auto-rows-fr'>
-        <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
-               <StackedBarChart Summary = {summary}/>
-            </div>
-        </div>
-        <div className=' text-white grid grid-cols-1 gap-2 sm:grid-cols-1 grid-rows-2 auto-rows-fr'>
-        <div className='m-3 text-white bg-neutral-900 rounded-lg shadow-xl min-h-[50px] flex justify-center align-center'>
-               <PurchaseScatterPlot/>
-            </div>
-        </div> */}
     
     </div>
   )

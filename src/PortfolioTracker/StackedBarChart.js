@@ -7,15 +7,12 @@ function StackedBarChart({Summary}) {
 const svgRef = useRef()
 const wrapperRef =  useRef()
 const groupRef =  useRef()
+const x_Label = useRef()
+const y_Label = useRef()
+const Group_Area = useRef()
 
 let keys = ["buy", "hold", "sell", "strongBuy", "strongSell"]
-let colors = {
-   "buy": "white",
-   "hold": "blue",
-   "sell": "purple",
-   "strongBuy": "pink",
-   "strongSell": "red"
-}
+
 
 const divRef = useRef()
 
@@ -33,19 +30,41 @@ var div = d3.select(divRef.current)
   .style("font-size", "20px")
 
 
-const svg = d3.select(svgRef.current)
-    .attr("transform", `translate(0, ${60})`);
-const WIDTH = 700 
-const HEIGHT = 450 
+// const svg = d3.select(svgRef.current)
+//     .attr("transform", `translate(0, ${60})`);
+// const WIDTH = 700 
+// const HEIGHT = 450 
 
-//         // Y label
-// const yLabel = d3.select(yLabel.current)
-//         .attr("class", "y axis-label")
-//         .attr("x", - (HEIGHT / 2))
-//         .attr("y", -60)
-//         .attr("font-size", "20px")
-//         .attr("text-anchor", "middle")
-//         .attr("transform", "rotate(-90)")
+const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 130, BOTTOM: 50 }
+const WIDTH = 800 - MARGIN.LEFT - MARGIN.RIGHT
+const HEIGHT = 600 - MARGIN.TOP - MARGIN.BOTTOM
+
+
+  const svg = d3.select(svgRef.current)
+  .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+  .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+
+
+const g = d3.select(Group_Area.current)
+.attr("transform", `translate(${MARGIN.LEFT - 40}, ${MARGIN.TOP})`)
+
+const xLabel = d3.select(x_Label.current)
+.attr("class", "x axisLabel")
+.attr("y", HEIGHT + 50)
+.attr("x", WIDTH / 2)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.attr("fill","white")
+.text("Months")
+
+const yLabel = d3.select(y_Label.current)
+.attr("class", "y axisLabel")
+.attr("transform", "rotate(-90)")
+.attr("y", -30)
+.attr("x", -290)
+.attr("fill","white")
+.attr("font-size", "20px")
+.text("Recommendation Trend")
 
 var color = d3.scaleOrdinal(d3.schemeCategory10)
 
@@ -81,7 +100,7 @@ function plotStackedBarChart(symbol){
   .paddingOuter(0.2)
 
   const xAxis = d3.axisBottom(xScale);
-  svg
+  g
   .select(".x-axis")
   .attr("transform", `translate(0, ${HEIGHT})`)
   .call(xAxis);
@@ -93,10 +112,10 @@ function plotStackedBarChart(symbol){
   .range([HEIGHT, 0]);
 
   const yAxis = d3.axisLeft(yScale)
-  svg.select(".y-axis")
+  g.select(".y-axis")
   .attr("transform", `translate(${20}, 0)`).transition().call(yAxis)
   
-svg
+g
   .selectAll(".layer")
   .data(layers)
   .join("g")
@@ -266,12 +285,17 @@ function getSelectedValues(event){
               </select>
         </div>
         <div ref={divRef}></div>
-        <svg   ref={svgRef} width="800" height="500">
+        <svg  ref={svgRef} width="800" height="500">
+    
                 <g ref={groupRef}>
-
                 </g>
-            <g className="x-axis" />
-            <g className="y-axis" />
+                <g ref={Group_Area}>
+                <text class="y axisLabel" ref={y_Label}></text> 
+                    <text class="x axisLabel" ref={x_Label}></text>
+                    <g className="x-axis" />
+                   <g className="y-axis" />
+                </g>
+        
         </svg>
     </div>
   )
