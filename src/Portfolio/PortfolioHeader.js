@@ -27,7 +27,9 @@ function PortfolioHeader({symbol, price, name}) {
     <div className='header_container flex flex-col justify-center'>
     <div>
         <div className='flex-col text-xl items-center justify-center'>
-            <h1 className='header_contents flex justify-start text-xl ml-3 mt-3 content-center pb-6'>Portfolio Management System</h1>
+            <h1 class="text-5xl text-white font-quicksand pt-5 pb-5">
+                Portfolio Management System
+            </h1>
         </div>
 
         

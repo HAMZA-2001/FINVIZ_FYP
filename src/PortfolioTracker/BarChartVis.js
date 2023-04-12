@@ -10,6 +10,7 @@ function BarChartVis({Summary, PMS}) {
 
     const svgRef = useRef()
     const groupRef = useRef()
+    const y_Label = useRef()
 
     const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 80, BOTTOM: 100 }
     const WIDTH = 700 - MARGIN.LEFT - MARGIN.RIGHT
@@ -33,16 +34,19 @@ function BarChartVis({Summary, PMS}) {
         .attr("y", HEIGHT + 60)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
-        .text("Month")
+        .attr("fill", "white")
+        .text("Stocks")
     
         // Y label
-        const yLabel = g.append("text")
-        .attr("class", "y axis-label")
+        const yLabel = d3.select(y_Label.current)
+        .attr("class", "y-axis-label")
         .attr("x", - (HEIGHT / 2))
         .attr("y", -60)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
+        .attr("fill", "white")
+        
         
         const x = d3.scaleBand()
         .range([0, WIDTH])
@@ -53,79 +57,36 @@ function BarChartVis({Summary, PMS}) {
         .range([HEIGHT, 0])
     
         const xAxisGroup = g.append("g")
-        .attr("class", "x axis")
-        .attr("transform", `translate(0, ${HEIGHT})`)
+        .attr("class", "x_axis")
+
     
         const yAxisGroup = g.append("g")
         .attr("class", "y axis")
-    // if (Summary.length > 0 ){
-        
-    //     const newData = Summary
-    //     update(newData, "marketcap")
-
-
-    //       function update(data, yValue) {
-    //         const value = "marketcap"
-    //         const t = d3.transition().duration(750)
-          
-    //         x.domain(data.map(d => d.Symbol))
-    //         y.domain([0, d3.max(data, d => d[yValue])])
-          
-    //         const xAxisCall = d3.axisBottom(x)
-    //         xAxisGroup.transition(t).call(xAxisCall)
-    //           .selectAll("text")
-    //             .attr("y", "10")
-    //             .attr("x", "-5")
-    //             .attr("text-anchor", "end")
-    //             .attr("transform", "rotate(-40)")
-          
-    //         const yAxisCall = d3.axisLeft(y)
-    //           .ticks(3)
-    //           .tickFormat(d => d + "m")
-    //         yAxisGroup.transition(t).call(yAxisCall)
-          
-    //         // JOIN new data with old elements.
-    //         const rects = g.selectAll("rect")
-    //           .data(data, d => d.Symbol)
-          
-    //         // // EXIT old elements not present in new data.
-    //         // rects.exit()
-    //         //   .attr("fill", "red")
-    //         //   .transition(t)
-    //         //     .attr("height", 0)
-    //         //     .attr("y", y(0))
-    //         //     .remove()
-          
-    //         // ENTER new elements present in new data...
-    //         rects.enter().append("rect")
-    //           .attr("fill", "grey")
-    //           .attr("class", "rect")
-    //           .attr("y", y(0))
-    //           .attr("height", 0)
-    //           // AND UPDATE old elements present in new data.
-    //           .merge(rects)
-    //           .transition(t)
-    //             .attr("x", (d) => x(d.Symbol))
-    //             .attr("width", x.bandwidth)
-    //             .attr("y", d => y(d[yValue]))
-    //             .attr("height", d => HEIGHT - y(d[yValue]))
-          
-    //         const text = "Revenue ($)"
-    //         yLabel.text(text)
-    //       }
-    
-
-    // }
 
     const [selectedValues , setSelectedValues] = useState("")
 
     function handleInputChange (event){
+
+    //  d3.selectAll(".y-axis-label").remove()
         const val = event.target.value
+        console.log(val)
+        if(val === "marketcap"){
+            yLabel.text("Market Cap")
+        }else if(val === "AverageCostPerShare"){
+            yLabel.text("Avg Cost Per Share")
+        }else if(val === "Total_Return"){
+            yLabel.text("Total Return")
+        }else if(val === "Current_Price"){
+            yLabel.text("Current Price")
+        }else if(val === "Highest_price"){
+            yLabel.text("Highest Price")
+        }
         setSelectedValues(val)
 
     }
 
         useEffect(() => {
+            
 
             const t = d3.transition().duration(750)
             var g = d3.select(groupRef.current)
@@ -139,14 +100,35 @@ function BarChartVis({Summary, PMS}) {
             .attr("y", 0)
             .remove()
 
+            d3.selectAll(".x_axis").transition().duration(3).remove()
+
             update(Summary, selectedValues)
             function update(data, yValue) {
+                console.log(yValue)
+                console.log(data)
                 const value = "marketcap"
                 const t = d3.transition().duration(750)
+
+                
               
                 x.domain(data.map(d => d.Symbol))
-                y.domain([d3.min(data, d => d[yValue]), d3.max(data, d => d[yValue])])
-              
+
+                // Set the minimum value of the y domain to 0
+            
+                if (d3.min(data, d => d[yValue]) >= 0) {
+                    y.domain([0, d3.max(data, d => d[yValue])])
+                    xAxisGroup.attr("transform", `translate(0, ${HEIGHT})`)
+                } else {
+                    y.domain([d3.min(data, d => d[yValue]) - 100, d3.max(data, d => d[yValue])])
+                    const axispos = y(0)
+                    xAxisGroup.attr("transform", `translate(0, ${axispos})`)
+                    
+                }
+
+
+                console.log(d3.min(data, d => d[yValue]))
+                console.log( d3.max(data, d => d[yValue]))
+
                 const xAxisCall = d3.axisBottom(x)
                 xAxisGroup.transition(t).call(xAxisCall)
                   .selectAll("text")
@@ -160,13 +142,13 @@ function BarChartVis({Summary, PMS}) {
                   .tickFormat(d => d + "")
                 yAxisGroup.transition(t).call(yAxisCall)
               
-                // JOIN new data with old elements.
+                //JOIN new data with old elements.
                 const rects = g.selectAll("rect")
                   .data(data, d => d.Symbol)
               
                 // ENTER new elements present in new data...
                 rects.enter().append("rect")
-                  .attr("fill", "grey")
+                  .attr("fill", d => d[yValue] < 0 ? "red" : "green")
                   .attr("class", "rect")
                   .attr("y", y(0))
                   .attr("height", 0)
@@ -175,11 +157,18 @@ function BarChartVis({Summary, PMS}) {
                   .transition(t)
                     .attr("x", (d) => x(d.Symbol))
                     .attr("width", x.bandwidth)
-                    .attr("y", d => y(d[yValue]))
-                    .attr("height", d => HEIGHT - y(d[yValue]))
-              
-                const text = "Revenue ($)"
-                yLabel.text(text)
+                    .attr("y", d => d[yValue] < 0 ? y(0) : y(d[yValue]))
+                    .attr("fill", d => d[yValue] < 0 ? "red" : "green")
+                    .attr("height", d => {
+                        console.log(d[yValue])
+                        if (d[yValue]>=0){
+                                return (Math.abs(y(d[yValue])-y(0)))
+                            }else{
+                                return (Math.abs(y(d[yValue])-y(0)))
+                            }
+                        }   
+                        
+                        )
               }
             
         }, [selectedValues]);
@@ -195,29 +184,10 @@ function BarChartVis({Summary, PMS}) {
                 })     
             }
             )
-        // setdbItems(dbcontents)
+
         return dbcontents
     }
 
-
-    // useEffect(() => {
-    //     const data = reteriveData()
-    //     setTimeout(()=>{
-    //         setdbItems(data)
-    //     },1000)
-    // }, []);
-
-    // useEffect(() => {
-    //     if(dbItems.length > 0){
-    //         dbItems.forEach((item, index)=>{
-    //             if (item.details !== ''){
-    //                 console.log(item.details)
-    //             }
-    //         })
-
-    //     }
-    //    console.log(dbItems)
-    // }, [dbItems]);
   return (
     <div>
         <FormControl>
@@ -243,7 +213,7 @@ function BarChartVis({Summary, PMS}) {
         </FormControl>
         <svg ref={svgRef} width="800" height="500">
             <g ref={groupRef}>
-
+               <text class="y axisLabel" ref={y_Label}></text> 
             </g>
         </svg>
     </div>

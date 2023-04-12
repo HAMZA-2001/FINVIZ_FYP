@@ -137,11 +137,11 @@ function ComparingStocksVis({Summary}) {
         const yLabel = d3.select(y_Label.current)
           .attr("class", "y axisLabel")
           .attr("transform", "rotate(-90)")
-          .attr("y", -60)
-          .attr("x", -290)
           .attr("font-size", "20px")
           .attr("text-anchor", "middle")
-          .text("Closing Price")
+          .attr("y", -50)
+          .attr("x", -270)
+          .text("Closing Price ($)")
 
           // scales
         const x = d3.scaleTime().range([0, WIDTH])

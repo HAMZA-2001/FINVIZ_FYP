@@ -87,8 +87,8 @@ function DashboardChart() {
               />
               <stop
                 offset="95%"
-                stopColor={"#rgb(333 210 254)"}
-                stopOpacity={0}
+                stopColor={"rgb(199 210 254)"}
+                stopOpacity={0.3}
               />
             </linearGradient>
           </defs>

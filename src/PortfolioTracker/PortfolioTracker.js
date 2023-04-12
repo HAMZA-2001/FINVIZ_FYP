@@ -449,13 +449,13 @@ function PortfolioTracker() {
                                                             <td class="p-3">
                                                                 <div class="flex align-items-center">
                                                                     <div class="ml-3">
-                                                                        <div class="">{((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare)).toFixed(2)}</div> 
-                                                                        <div class="text-gray-500">{(((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare))/(item.Total_Shares*item.AverageCostPerShare)*100).toFixed(2) + "%"}</div>
+                                                                        <div class={`${ parseInt(((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare)))> 0 ? 'text-green-400': 'text-red-400'}`}>{((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare)).toFixed(2)}</div> 
+                                                                        <div class={`${ parseInt((((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare))/(item.Total_Shares*item.AverageCostPerShare)*100))> 0 ? 'text-green-200': 'text-red-200'}`}>{(((item.Current_Price*item.Total_Shares) - (item.Total_Shares*item.AverageCostPerShare))/(item.Total_Shares*item.AverageCostPerShare)*100).toFixed(2) + "%"}</div>
                                                                     </div>
                                                                 </div>
                                                             </td>
                                                             <td class="p-3">
-                                                                <span class="text-gray-50 rounded-md px-2">{(-item.Total_Return/totalreturnSum * 100).toFixed(2)}</span>
+                                                                <span class={`text-gray-50 rounded-md px-2 ${ parseInt(-item.Total_Return/totalreturnSum * 100)> 0 ? 'text-green-400': 'text-red-400'}`}>{(-item.Total_Return/totalreturnSum * 100).toFixed(2)}</span>
                                                             </td>
                                                             <td class="p-3">
                                                                 <span class="text-gray-20 rounded-md px-2">{item.First_Buy_Date}</span>

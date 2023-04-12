@@ -9,6 +9,7 @@ function AnalysisChart({d}) {
     const x_axis = useRef()
     const y_axis = useRef()
     const groupRef = useRef()
+    const tooltipRef = useRef();
     useEffect(()=>{     
         if(d.length > 0){
             const MARGIN = { LEFT: 100, RIGHT: 100, TOP: 50, BOTTOM: 100 }
@@ -26,7 +27,8 @@ function AnalysisChart({d}) {
             .attr("x1", "10%")
             .attr("y1", "50%")
             .attr("x2", "200%")
-            .attr("y2", "100%");
+            .attr("y2", "100%")
+            .attr("stroke-opacity", "1");
 
             gradient.append("stop")
             .attr("offset", "0%")
@@ -51,20 +53,22 @@ function AnalysisChart({d}) {
 
           const xLabel = d3.select(x_Label.current)
           .attr("class", "x axisLabel")
-          .attr("y", HEIGHT + 50)
+          .attr("y", HEIGHT + 70)
           .attr("x", WIDTH / 2)
           .attr("font-size", "20px")
           .attr("text-anchor", "middle")
-          .text("Years")
+          .attr("fill", "white")
+          .text("Dates")
 
         const yLabel = d3.select(y_Label.current)
           .attr("class", "y axisLabel")
           .attr("transform", "rotate(-90)")
           .attr("y", -60)
-          .attr("x", -290)
+          .attr("x", -250)
           .attr("font-size", "20px")
           .attr("text-anchor", "middle")
-          .text("Closing Price")
+          .attr("fill", "white")
+          .text("Portfolio's Investment Activity ($)")
 
 
             
@@ -168,22 +172,54 @@ console.log(accumulated);
   .attr('d', lineGenerator)
   .style("stroke", "url(#gradient)")
 
+  // Add data points
+  g
+  .selectAll(".data-point")
+  .data(accumulated)
+  .enter()
+  .append("circle")
+  .attr("class", "data-point")
+  .attr("cx", (d) => xScale(new Date(d.date)))
+  .attr("cy", (d) => yScale(d.amount))
+  .attr("r", 5)
+  .attr("fill", "grey")
+  .on("mouseover", (event, d) => {
+    const tooltip = d3.select(tooltipRef.current);
+    tooltip.html(`Value: ${d.amount}`);
+    tooltip.style("display", "inline-block");
+  })
+  .on("mousemove", (event) => {
+    const tooltip = d3.select(tooltipRef.current);
+    tooltip.style("left", event.pageX + 10 + "px");
+    tooltip.style("top", event.pageY - 10 + "px");
+  })
+  .on("mouseout", () => {
+    const tooltip = d3.select(tooltipRef.current);
+    tooltip.style("display", "none");
+  });
+
+  if(accumulated.length>0){
+    
+
+
+  }
+
 }
 
     },[d])
   return (
-    <div>AnalysisChart
+    <div>
+      <div ref={tooltipRef} style={{ display: "none", position: "absolute" }} />
                 <svg ref={Chart_Area} width="800" height="500">
                   <g ref={groupRef}>
                   </g>
                     <g ref={Group_Area}  >
-                    <text className="y axisLabel" ref={y_Label}>Open</text> 
-                    <text className="x axisLabel" ref={x_Label}>Years</text>
+                    <text className="y axisLabel" ref={y_Label}></text> 
+                    <text className="x axisLabel" ref={x_Label}></text>
                     <g className="x axis" ref={x_axis}></g>
                     <g className="x axis" ref={y_axis}></g>
                     <g className="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"></g>
                     </g>
-                {/* <g class="line path"></g> */}
                 </svg>
     </div>
   )
