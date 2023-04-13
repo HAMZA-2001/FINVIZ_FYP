@@ -240,8 +240,13 @@ function MachineLearningModel() {
         }
     },[combinedData])
   return (
-        <div className = 'flex justify-center mt-48'>
-                <svg ref={Chart_Area} width="800" height="500">
+        <div className = 'flex flex-col  mt-32'>
+        <div className = 'flex flex-col  mb-10'>
+        <h1 className='text-5xl text-white font-quicksand pt-5 pb-5'>Machine Learning For Pridicting Furture Values for S&P 500</h1>
+        </div>
+
+        <div className = 'flex justify-center'>
+        <svg ref={Chart_Area} width="800" height="500">
                     <g ref={Group_Area}  >
                     <text class="y axisLabel" ref={y_Label}>Closing Price</text> 
                     <text class="x axisLabel" ref={x_Label}>Time Period</text>
@@ -250,6 +255,8 @@ function MachineLearningModel() {
                     <g class="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"></g>
                     </g>           
                 </svg>
+        </div>
+
         </div>
   );
 }

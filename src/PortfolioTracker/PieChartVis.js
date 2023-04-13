@@ -15,12 +15,14 @@ function PieChartVis({Summary, PMS}) {
     const divRef = useRef()
     const divRef2 = useRef()
     const sliderdivRef = useRef()
+    const tooltipRef = useRef();
     
     const [selectValue, setselectValue] = useState("")
     const [selectedData, setSelectedData] = useState("mc")
 
-    var width = 600
-    var height = 500
+    
+    var width = 700
+    var height = 590
     var radius = Math.min(width, 400) / 2
     var color = d3.scaleOrdinal(d3.schemeCategory10)
     var arc = d3.arc()
@@ -81,12 +83,6 @@ function PieChartVis({Summary, PMS}) {
             .style("display", "flex")
             .style("flex-direction", "column")
             .style("justify-content", "center")
-            
-            // .attr("class", "tooltip-donut")
-            // .style("opacity", 0)
-            // .style("position", "absolute")
-            // .style('width', "10px")
-            // .style('height', "10px")
             
 
         g.append("path")
@@ -230,14 +226,13 @@ function PieChartVis({Summary, PMS}) {
      
 
 
-        g.append("path")
+         g.append("path")
             .attr("d", arc)
             .attr("class", "pathClass")
             .style("fill", function(d,i){return color(i)})
             .on('mouseover', function (event, d) {
                 d3.select(this).transition()
-                .duration('50')
-                // .attr("d", arcOver)             
+                .duration('50')        
                 .attr("stroke-width",16);
         
                 div.transition()
@@ -292,51 +287,8 @@ function PieChartVis({Summary, PMS}) {
                     .attr("stroke-width",6)
                     .attr('opacity', '1');
                     div.transition()
-                    .style("opacity", 0);
-                //makes arc smaller
-                // if(!clicked){
-                    // d3.select(this).transition()
-                    // .duration('50')
-                    // .attr("d", arcOut)             
-                    // .attr("stroke-width",6)
-                    // .attr('opacity', '1');
-                    // div.transition()
-                    // .duration('50')
-                    // .style("opacity", 0);
-
-                // makes arc bigger
-                // }
-                // else if(clicked && i.index === clickedIdx){
-                //     clicked = false
-                //     d3.select(this).transition()
-                //     .duration('50')
-                //     .attr("d", arcOver)             
-                //     .attr("stroke-width",6)
-                //     .attr('opacity', '1');
-                //     div.transition()
-                //     .duration('50')
-                //     .style("opacity", 1);
-
-                //     // want to make a div to stay when the user click on the pie chart
-                //     // svg.append("div")
-
-                // }
-
-
-                
-                })
-            // .on('click', function(d, i){
-            //     // user clicks this then 
-            //     if(!clicked){
-            //         clicked = !clicked
-            //         clickedIdx = i.index
-            //     }
-
-            //     console.log(clicked)
-            //     console.log(clickedIdx)
-
-            // })
-        ;
+                    .style("opacity", 0);           
+                });
 
         g.append("text")
         .attr("transform", function(d){
@@ -492,19 +444,31 @@ function PieChartVis({Summary, PMS}) {
 
         // slider
         const innerGroup = g.append("g")
-                    .attr("transform", function(d){
-                        console.log(d)
-                    if(d.endAngle - d.startAngle >= 0.2){
-                        d.innerRadius = radius - 50;
-                        d.outerRadius = radius - 20;
-                        console.log(arc.centroid(d))
-                        return "translate(" + arc.centroid(d) + ")" + " " + "rotate(30)";
-                    }else{
-                     
-                        return "translate(" +1000+ ")" + " " + "rotate(30)";
-                    }
-                   
-                    })
+        .attr("transform", function(d){
+            console.log(d)
+        if(d.endAngle - d.startAngle >= 0.2){
+            d.innerRadius = radius - 50;
+            d.outerRadius = radius - 20;
+            console.log(arc.centroid(d))
+            var midAngle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+            var degrees = midAngle * 180 / Math.PI - 90;
+            if (degrees > 90) {
+              degrees -= 180;
+              return "translate(" + arc.centroid(d) + ")" + " " + "rotate(" + degrees + ")";
+            }else{
+                console.log(degrees+90)
+                degrees+=180
+                return "translate(" + arc.centroid(d) + ")" + "rotate(" +  degrees + ")" ;
+            }
+            // return "rotate(" + degrees + ")";
+
+            
+        }else{
+         
+            return "translate(" +1000+ ")" + " " + "rotate(30)";
+        }
+       
+        })
                     .attr("text-anchor", "middle")
                     // .attr("viewBox", "0 0 24 24")
                     
@@ -515,17 +479,134 @@ function PieChartVis({Summary, PMS}) {
             innerSVG.html(cont)
             innerSVG.append('input').attr("type", "number")
             if(selectValue === "slider"){
-                const sg = innerGroup.append("svg").attr("width", "100%")
 
-                    sg.append("path")
-                // .attr("d", "M21,11H17.81573a2.98208,2.98208,0,0,0-5.63146,0H3a1,1,0,0,0,0,2h9.18433a2.982,2.982,0,0,0,5.6314,0H21a1,1,0,0,0,0-2Zm-6,2a1,1,0,1,1,1-1A1.0013,1.0013,0,0,1,15,13Z")
-                // .attr("width", "50px")
-                .attr("d", "M21,11H19.81573a2.98208,2.98208,0,0,0-5.63146,0H9.81573a2.98208,2.98208,0,0,0-5.63146,0H3a1,1,0,0,0,0,2H4.18433a2.982,2.982,0,0,0,5.6314,0h4.3686a2.982,2.982,0,0,0,5.6314,0H21a1,1,0,0,0,0-2ZM7,13a1,1,0,1,1,1-1A1.0013,1.0013,0,0,1,7,13Zm10,0a1,1,0,1,1,1-1A1.0013,1.0013,0,0,1,17,13Z")
-                .attr("fill", "#6563ff")
+                // // Add sliders to each segment
+                // var sliders = g.selectAll("circle")
+                // .data(pie(d))
+                // .enter()
+                // .append("circle")
+                // .attr("r", 8)
+                // .attr("cx", function(d) {
+                // var a = d.startAngle + (d.endAngle - d.startAngle)/2 - Math.PI/2;
+                // return Math.cos(a) * (radius + 20);
+                // })
+                // .attr("cy", function(d) {
+                // var a = d.startAngle + (d.endAngle - d.startAngle)/2 - Math.PI/2;
+                // return Math.sin(a) * (radius + 20);
+                // })
+                // .attr("fill", "#333");
+
+                // Add sliders to each segment
+                var sliders = g.selectAll(".slider")
+                .data(pie(d))
+                .enter()
+                .append("g")
+                .attr("class", "slider")
+                .attr("transform", function(d){
+                    console.log(d)
+                if(d.endAngle - d.startAngle >= 0.2){
+                    d.innerRadius = radius - 50;
+                    d.outerRadius = radius - 20;
+                    console.log(arc.centroid(d))
+                    var midAngle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+                    var degrees = midAngle * 180 / Math.PI - 90;
+                    if (degrees > 90) {
+                      degrees -= 180;
+                      return "translate(" + arc.centroid(d) + ")" + " " + "rotate(" + degrees + ")";
+                    }else{
+                        console.log(degrees+90)
+                        degrees+=180
+                        return "translate(" + arc.centroid(d) + ")" + "rotate(" +  degrees + ")" ;
+                    }
+                    // return "rotate(" + degrees + ")";
+
+                    
+                }else{
+                 
+                    return "translate(" +1000+ ")" + " " + "rotate(30)";
+                }
+               
+                })
+                // .attr("transform", function(d) {
+                // var a = (d.startAngle + d.endAngle) / 2 - Math.PI / 2;
+                // return "translate(" + Math.cos(a) * (radius + 20) + "," + Math.sin(a) * (radius + 20) + ")";
+                // });
+
+                // Add a line to each slider
+                sliders.append("line")
+                .attr("x1", -100)
+                .attr("y1", 0)
+                .attr("x2", 10)
+                .attr("y2", 0)
+                .style("stroke", "#000")
+                .style("stroke-width", 4);
+
+                // Add two circles to each slider
+                sliders.append("circle")
+                .attr("class", "circle1")
+                .attr("cx", function(d){
+                    const high = (d.data["52WeekHigh"]*-100)/450
+                    return high
+
+                })
+                .attr("cy", 0)
+                .attr("r", 6)
+                .style("fill", "#fff")
+                .style("stroke", "#000")
+                .on("mouseover", (event, d) => {
+                    const tooltip = d3.select(tooltipRef.current);
+                    tooltip.html(`High: ${d.data["52WeekHigh"]}`);
+                    tooltip.style("display", "inline-block");
+                })
+                .on("mousemove", (event) => {
+                    const tooltip = d3.select(tooltipRef.current);
+                    tooltip.style("left", event.pageX + 10 + "px");
+                    tooltip.style("top", event.pageY - 10 + "px");
+                })
+                .on("mouseout", () => {
+                    const tooltip = d3.select(tooltipRef.current);
+                    tooltip.style("display", "none");
+                });
+
+                sliders.append("circle")
+                .attr("class", "circle2")
+                .attr("cx", function(d){
+                    const high = (d.data["52WeekLow"]*-100)/450
+                    return high
+
+                })
+
+                .attr("cy", 0)
+                .attr("r", 6)
+                .style("fill", "#aaa")
+                .style("stroke", "#555")
+                .on("mouseover", (event, d) => {
+                    const tooltip = d3.select(tooltipRef.current);
+                    tooltip.html(`Low: ${d.data["52WeekLow"]}`);
+                    tooltip.style("display", "inline-block");
+                })
+                .on("mousemove", (event) => {
+                    const tooltip = d3.select(tooltipRef.current);
+                    tooltip.style("left", event.pageX + 10 + "px");
+                    tooltip.style("top", event.pageY - 10 + "px");
+                })
+                .on("mouseout", () => {
+                    const tooltip = d3.select(tooltipRef.current);
+                    tooltip.style("display", "none");
+                });
+
+        
+                // const sg = innerGroup.append("svg").attr("width", "100%")
+
+                //     sg.append("path")
+                // // .attr("d", "M21,11H17.81573a2.98208,2.98208,0,0,0-5.63146,0H3a1,1,0,0,0,0,2h9.18433a2.982,2.982,0,0,0,5.6314,0H21a1,1,0,0,0,0-2Zm-6,2a1,1,0,1,1,1-1A1.0013,1.0013,0,0,1,15,13Z")
+                // // .attr("width", "50px")
+                // .attr("d", "M21,11H19.81573a2.98208,2.98208,0,0,0-5.63146,0H9.81573a2.98208,2.98208,0,0,0-5.63146,0H3a1,1,0,0,0,0,2H4.18433a2.982,2.982,0,0,0,5.6314,0h4.3686a2.982,2.982,0,0,0,5.6314,0H21a1,1,0,0,0,0-2ZM7,13a1,1,0,1,1,1-1A1.0013,1.0013,0,0,1,7,13Zm10,0a1,1,0,1,1,1-1A1.0013,1.0013,0,0,1,17,13Z")
+                // .attr("fill", "#6563ff")
            
                 
                 innerGroup.append("text")
-                .attr("x", -30)
+                .attr("x", -110)
                 .attr("y", 10)
                 .attr("dy", ".35em")
                 .attr("fill", "white" ).text( function(d, i) {
@@ -533,7 +614,7 @@ function PieChartVis({Summary, PMS}) {
                 return (d.data["52WeekHigh"])})
 
                 innerGroup.append("text")
-                .attr("x", 40)
+                .attr("x", 30)
                 .attr("y", 10)
                 .attr("dy", ".35em")
                 .attr("fill", "white" ).text( function(d, i) {
@@ -669,19 +750,24 @@ function PieChartVis({Summary, PMS}) {
                     Button
                     </button> */}
             </div>
-            {/* <div ref={sliderdivRef} class="slidecontainer"><input type="range" min="1" max="100" value="50" class="slider" id="myRange"/></div>
-             */}
+            
 
              <div ref={divRef2}>
                 {/* <button ref={contentRef} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
                     Button
                     </button> */}
             </div>            
-            <div className='h-full'>
-                <svg className= "pt-6" ref={svgRef} width="800" height="500">
+
+
+            <div  className='h-full mb-5'>
+            <div ref={tooltipRef} style={{ display: "none", position: "absolute" }} />
+            {/* <div ref={sliderdivRef} class="slidecontainer"><input type="range" min="1" max="100" value="50" class="slider" id="myRange"/></div> */}
+                <svg className= "pt-6 " ref={svgRef} width="800" height="500">
                     <g ref={groupRef}>
                     </g>
                 </svg>
+                
+            
                 {/* <div className='bg-white absolute top-2/4 left-12'>
                         hello
                 </div> */}
