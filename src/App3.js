@@ -39,6 +39,7 @@ function App3() {
 
     const Chart_Area = useRef()
     const Group_Area = useRef()
+    const groupRef = useRef()
     const x_Label = useRef()
     const y_Label = useRef()
     const x_axis = useRef()
@@ -60,13 +61,13 @@ function App3() {
 
     // Setting up the canvas for visualization purposes
      const MARGIN = { LEFT: 100, RIGHT: 100, TOP: 50, BOTTOM: 100 }
-     const WIDTH = 1900 - MARGIN.LEFT - MARGIN.RIGHT
-     const HEIGHT = 900 - MARGIN.TOP - MARGIN.BOTTOM
+     const WIDTH = 2400 - MARGIN.LEFT - MARGIN.RIGHT
+     const HEIGHT = 1100 - MARGIN.TOP - MARGIN.BOTTOM
      
      const svg = d3.select(Chart_Area.current)
        .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
        .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
-       .style("background", '#FCFBF4')
+    //    .style("background", '#FCFBF4')
        .style("border-radius", '50px')
        .attr("overflow", "hidden")
 
@@ -87,13 +88,15 @@ function App3() {
         .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
 
     // axis groups
-    const xAxis = d3.select(x_axis.current).style("background","white")
+    const xAxis = d3.select(x_axis.current)
         .attr("class", "x axis")
         .attr("transform", `translate(0, ${HEIGHT})`)
+        .attr("fill", "white")
+        .style("stroke-width", "1px")
 
 
-    const yAxis = d3.select(y_axis.current).style("background","white")
-        .attr("class", "y axis")  // set axis tick labels to white
+    const yAxis = d3.select(y_axis.current)
+        .attr("class", "y-axis")  // set axis tick labels to white
 
     const xLabel = d3.select(x_Label.current)
             .attr("class", "x axisLabel")
@@ -101,26 +104,25 @@ function App3() {
             .attr("x", WIDTH / 2)
             .attr("font-size", "20px")
             .attr("text-anchor", "middle")
-            .text("Time Period")
+
             // .attr("fill","white")
 
     const yLabel = d3.select(y_Label.current)
             .attr("class", "y axisLabel")
             .attr("transform", "rotate(-90)")
-            .attr("y", -50)
-            .attr("x", -360)
-            .attr("font-size", "20px")
+            .attr("y", -70)
+            .attr("x", -400)
+            .attr("font-size", "40px")
             .attr("text-anchor", "middle")
             .text("Price ($)")
+            .attr("fill", "white")
                 
         // scales
         const x = d3.scaleTime().range([0, WIDTH])
         const y = d3.scaleLinear().range([HEIGHT, 0])
 
         
-        // axis generators
-        const xAxisCall = d3.axisBottom().tickSizeOuter(5)
-        const yAxisCall = d3.axisLeft().tickSizeOuter(0)
+
         
             // .ticks(6)
 
@@ -229,8 +231,8 @@ function App3() {
 
     // Setting up canvas for volume bar chart visualization purposes
     const VOL_MARGIN = { LEFT: 100, RIGHT: 100, TOP: 50, BOTTOM: 100 }
-    const VOL_WIDTH = 1900 - MARGIN.LEFT - MARGIN.RIGHT
-    const VOL_HEIGHT = 900 - MARGIN.TOP - MARGIN.BOTTOM
+    const VOL_WIDTH = 2400 - MARGIN.LEFT - MARGIN.RIGHT
+    const VOL_HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM
 
     const xvolLabel = d3.select(xvol_Label.current)
     .attr("class", "x axisLabel")
@@ -245,14 +247,14 @@ function App3() {
     .attr("class", "y axisLabel")
     .attr("transform", "rotate(-90)")
     .attr("y", -80)
-    .attr("x", -360)
+    .attr("x", -110)
     .attr("font-size", "20px")
     .attr("text-anchor", "middle")
     .text("Volume (Weekly)")
     .attr("fill", "white")
 
-    const volumeSvg = d3.select(volume_Svg.current).attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
-    .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+    const volumeSvg = d3.select(volume_Svg.current).attr("width", VOL_WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+    .attr("height", VOL_HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
     .style("border-radius", '50px')
     .attr("overflow", "hidden")
     .attr("overflow", "hidden")
@@ -264,14 +266,14 @@ function App3() {
     const volumegroup = d3.select(Volume_Area.current);
 
     
-
+    const legendg = d3.select(groupRef.current)
     const volxAxisCall = d3.axisBottom();
     const volyAxisCall = d3.axisLeft();
 
     // axis groups for volumes
     const volxAxis = d3.select(volx_axis.current)
         .attr("class", "volx axis")
-        .attr("transform", `translate(0, ${HEIGHT})`)
+        .attr("transform", `translate(0, ${VOL_HEIGHT})`)
 
     const volyAxis = d3.select(voly_axis.current)
         .attr("class", "voly axis")  // set axis tick labels to white
@@ -311,9 +313,16 @@ function App3() {
                     d3.max(ydomainData) * 1.005
                 ])
 
+                        // axis generators
+        const xAxisCall = d3.axisBottom().tickSizeOuter(2).tickPadding(10).tickSizeInner(10).ticks(10)
+        const yAxisCall = d3.axisLeft()
+        // .tickSize(-WIDTH)
+
                 xAxisCall.scale(x)
-                xAxis.transition(t).call(xAxisCall)
+                xAxis.call(xAxisCall)
                 yAxisCall.scale(y)
+
+     
 
                 const volx = d3.scaleTime().range([0, VOL_WIDTH])
                 const voly = d3.scaleLinear().range([VOL_HEIGHT, 0])
@@ -333,7 +342,7 @@ function App3() {
                         ])
     
                         volxAxisCall.scale(volx)
-                        volxAxis.transition(t).call(volxAxisCall)
+                        volxAxis.call(volxAxisCall)
                         volyAxisCall.scale(voly)
                         volyAxis.transition(t).call(volyAxisCall)
                       
@@ -377,7 +386,52 @@ function App3() {
                     }
      
 
-                    yAxis.attr("fill","white").transition(t).call(yAxisCall)
+                    yAxis.transition(t).call(yAxisCall)
+
+                    g.selectAll(".tick line")
+                    .style("stroke", "white");
+                    g.selectAll(".tick text")
+                    .style("fill", "white");
+
+                    // Add horizontal grid lines to y-axis
+                    g.selectAll(".grid-line").remove()
+                    g
+                    .selectAll(".y-axis .tick")
+                    .append("line")
+                    .attr("class", "grid-line")
+                    .attr("x1", 0)
+                    .attr("x2", WIDTH)
+                    .attr("y1", 0)
+                    .attr("y2", 0)
+                    .attr("stroke", "#ccc")
+                    .attr("stroke-opacity", 0.5);
+                    // .selectAll(".tick line")
+                    // .style("stroke", "#ccc")
+                    // .style("stroke-opacity", 0.5);
+
+             
+                    legendg.selectAll(".legend").remove()
+                    var color = d3.scaleOrdinal(d3.schemeCategory10)
+                    console.log(dataTimeFiltered)
+                    var legend = legendg.append("g")
+                    .attr("class", "legend")
+                    .attr("transform", "translate(" + (WIDTH + 120) + "," + 20 + ")")
+                    .selectAll("g")
+                    .data(dataTimeFiltered)
+                    .enter().append("g")
+                    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+            
+                    legend.append("rect")
+                    .attr("width", 18)
+                    .attr("height", 18)
+                    .style("fill", function(d, i) { return colorScale(colorValue(d)) });
+            
+                    legend.append("text")
+                    .attr("x", 24)
+                    .attr("y", 9)
+                    .attr("dy", ".35em")
+                    .attr("fill", "white" )
+                    .text(function(d) { return d.key});
                 
                     // Path generator
                     const line = d3.line()
@@ -436,8 +490,7 @@ function App3() {
                             d3.select(this)
                               .transition()
                               .duration(300)
-                              .attr('fill', 'orange')
-                              .attr('height',400);
+                              .attr('height', d =>  voly(0) + voly(d.y_val));
                           })
                           .on('mouseout', function() {
                             d3.select(this)
@@ -570,6 +623,8 @@ function App3() {
             <div>
                 <div ref={wrapperRef} style={{ marginBottom: "2rem" }}>
                     <svg ref={Chart_Area} width="800" height="500">
+                    <g ref={groupRef}>
+                    </g>
                         <g ref={Group_Area}  >
                         <text class="y axisLabel" ref={y_Label}>Open</text> 
                         <text class="x axisLabel" ref={x_Label}>Years</text>
