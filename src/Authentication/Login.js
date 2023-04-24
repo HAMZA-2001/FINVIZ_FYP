@@ -3,6 +3,11 @@ import loginImg from "./login.svg"
 import { useAuth } from './context/AuthContext'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 
+/**
+ * displays the login page and performs backend user authentication checks to determine the access
+ * @component
+ * @returns a login page with email and password inputs
+ */
 function Login() {
     const emailRef = useRef()
     const passwordRef = useRef()
@@ -10,9 +15,12 @@ function Login() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
-  
+
+    /**
+     * verifies the authentication
+     * @param {object} e event type
+     */
     async function handleSubmit(e){
-      // e.preventDefault()
       console.log(emailRef.current.value)
       console.log(passwordRef.current.value)
 
@@ -41,7 +49,6 @@ function Login() {
               <div className='image w-80'>
                   <img src={loginImg} className="w-full h-full"></img>
               </div>
-              {/* <h2 className='text-white text-center mb-4'>{currentUser.email}</h2> */}
               {error && <h1 className='text-white'>{error}</h1>}
               <div className='form mt-2 flex flex-col items-center w-full'>
                   <div className='form-group flex flex-col items-start w-fit'>

@@ -3,18 +3,25 @@ import loginImg from "./login.svg"
 import { useAuth } from './context/AuthContext'
 import { Link } from 'react-router-dom'
 
+/**
+ * displays the signup page and and create the users account upon valid credentials provided
+ * @component
+ * @returns a signup page with email and password inputs
+ */
 function Signup() {
   const emailRef = useRef()
   const passwordRef = useRef()
   const passwordConfirmRef = useRef()  
   const {signup, currentUser} = useAuth()
   const [error, setError] = useState('')
+  const [sucess, setSucess] = useState('')
   const [loading, setLoading] = useState(false)
 
+  /**
+   * checks whether the account have been successfully created 
+   * @param {object} e event type
+   */
   async function handleSubmit(e){
-    // e.preventDefault()
-    console.log(emailRef.current.value)
-    console.log(passwordRef.current.value)
 
     if (passwordRef.current.value !== passwordConfirmRef.current.value){
       return setError('Password do not match')
@@ -27,10 +34,9 @@ function Signup() {
       await signup(emailRef.current.value, passwordRef.current.value)
     } catch {
       setError('Failed to create an account')
+      setSucess("Account created sucessfully")
     }
-
     setLoading(false)
-
   }
 
 
@@ -44,8 +50,7 @@ function Signup() {
             <div className='image w-80'>
                 <img src={loginImg} className="w-full h-full"></img>
             </div>
-            {/* <h2 className='text-white text-center mb-4'>{currentUser.email}</h2> */}
-            {error && <h1 className='text-white'>{error}</h1>}
+            {error ? <h1 className='text-white'>{sucess}</h1> : <h1 className='text-white'>{sucess}</h1>}
             <div className='form mt-2 flex flex-col items-center w-full'>
                 <div className='form-group flex flex-col items-start w-fit'>
                     <label htmlFor='email' className='text-white text-lg'>Email</label>

@@ -1,4 +1,32 @@
-import React, { useEffect, useRef } from 'react'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Analysis/AnalysisChart.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Analysis/AnalysisChart.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useRef } from 'react'
 import * as d3 from "d3";
 
 /**
@@ -101,7 +129,7 @@ function AnalysisChart({d}) {
 
 
 
-for (let i = 0; i < sellList.length; i++) {
+for (let i = 0; i &lt; sellList.length; i++) {
     const sellDate = sellList[i].date;
     const buyIndex = buyList.findIndex(buyItem => buyItem.date === sellDate);
     if (buyIndex === -1) {
@@ -117,14 +145,14 @@ for (let i = 0; i < sellList.length; i++) {
 let accumulated = [];
 
 // iterate over buy and accumulate amounts
-for (let i = 0; i < buyList.length; i++) {
+for (let i = 0; i &lt; buyList.length; i++) {
   let current = buyList[i];
   let prevAccumulated = accumulated.length ? accumulated[accumulated.length - 1].amount : 0;
   let total = prevAccumulated + current.amount;
 
   // check if current date is in sell
   let sellAmount = 0;
-  for (let j = 0; j < sellList.length; j++) {
+  for (let j = 0; j &lt; sellList.length; j++) {
     if (sellList[j].date === current.date) {
       sellAmount = sellList[j].amount;
       
@@ -207,21 +235,43 @@ for (let i = 0; i < buyList.length; i++) {
 
     },[d])
   return (
-    <div>
-      <div ref={tooltipRef} style={{ display: "none", position: "absolute" }} />
-                <svg ref={Chart_Area} width="800" height="500">
-                  <g ref={groupRef}>
-                  </g>
-                    <g ref={Group_Area}  >
-                    <text className="y axisLabel" ref={y_Label}></text> 
-                    <text className="x axisLabel" ref={x_Label}></text>
-                    <g className="x axis" ref={x_axis}></g>
-                    <g className="x axis" ref={y_axis}></g>
-                    <g className="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"></g>
-                    </g>
-                </svg>
-    </div>
+    &lt;div>
+      &lt;div ref={tooltipRef} style={{ display: "none", position: "absolute" }} />
+                &lt;svg ref={Chart_Area} width="800" height="500">
+                  &lt;g ref={groupRef}>
+                  &lt;/g>
+                    &lt;g ref={Group_Area}  >
+                    &lt;text className="y axisLabel" ref={y_Label}>&lt;/text> 
+                    &lt;text className="x axisLabel" ref={x_Label}>&lt;/text>
+                    &lt;g className="x axis" ref={x_axis}>&lt;/g>
+                    &lt;g className="x axis" ref={y_axis}>&lt;/g>
+                    &lt;g className="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end">&lt;/g>
+                    &lt;/g>
+                &lt;/svg>
+    &lt;/div>
   )
 }
 
-export default AnalysisChart
+export default AnalysisChart</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AnalysisChart">AnalysisChart</a></li><li><a href="global.html#AnalysisPage">AnalysisPage</a></li><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthenticationPage">AuthenticationPage</a></li><li><a href="global.html#BarChartVis">BarChartVis</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#ComparingStocksVis">ComparingStocksVis</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#MachineLearningModel">MachineLearningModel</a></li><li><a href="global.html#Overview">Overview</a></li><li><a href="global.html#PieChartVis">PieChartVis</a></li><li><a href="global.html#Popup">Popup</a></li><li><a href="global.html#PortfolioHeader">PortfolioHeader</a></li><li><a href="global.html#PortfolioSearchResults">PortfolioSearchResults</a></li><li><a href="global.html#PortfolioSummary">PortfolioSummary</a></li><li><a href="global.html#PortfolioTracker">PortfolioTracker</a></li><li><a href="global.html#PurchaseScatterPlot">PurchaseScatterPlot</a></li><li><a href="global.html#Search">Search</a></li><li><a href="global.html#SearchResults">SearchResults</a></li><li><a href="global.html#Signup">Signup</a></li><li><a href="global.html#StackedBarChart">StackedBarChart</a></li><li><a href="global.html#StockSearch">StockSearch</a></li><li><a href="global.html#VisualizationPage">VisualizationPage</a></li><li><a href="global.html#convertDateToUnixTimestamp">convertDateToUnixTimestamp</a></li><li><a href="global.html#convertISODate">convertISODate</a></li><li><a href="global.html#convertUnixTimestampToDate">convertUnixTimestampToDate</a></li><li><a href="global.html#createDate">createDate</a></li><li><a href="global.html#fetchStockOverview">fetchStockOverview</a></li><li><a href="global.html#generateTickerID">generateTickerID</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#insertUser">insertUser</a></li><li><a href="global.html#updateUser">updateUser</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Apr 24 2023 20:10:13 GMT+0800 (Malaysia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

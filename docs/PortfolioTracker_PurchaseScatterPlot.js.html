@@ -1,4 +1,32 @@
-import { getDatabase, onValue, ref } from 'firebase/database'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: PortfolioTracker/PurchaseScatterPlot.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: PortfolioTracker/PurchaseScatterPlot.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { getDatabase, onValue, ref } from 'firebase/database'
 import React, { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../Authentication/context/AuthContext'
 import * as d3 from "d3";
@@ -194,7 +222,7 @@ function PurchaseScatterPlot() {
             let showAmount = d.amount
             console.log(showDate, showAmount)
           div.style("opacity", "1");
-              let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+              let fill = "&lt;h1> Date : " + showDate +"&lt;/h1>" + "&lt;h1> Spent : " + showAmount +"&lt;/h1>"
               console.log(event.pageX)
               div.html(fill)
               .style("left", (event.pageX + 10) + "px")
@@ -231,7 +259,7 @@ function PurchaseScatterPlot() {
             let showAmount = d.amount
             console.log(showDate, showAmount)
           div.style("opacity", "1");
-              let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+              let fill = "&lt;h1> Date : " + showDate +"&lt;/h1>" + "&lt;h1> Spent : " + showAmount +"&lt;/h1>"
               div.html(fill)
               .style("left", (event.pageX + 10) + "px")
               .style("top", (event.pageY - 15) + "px");
@@ -264,7 +292,7 @@ function PurchaseScatterPlot() {
         const amountExtent = d3.extent(amounts);
 
         const x = d3.scaleTime()
-            .domain(dateExtent) // <-- convert date string to Date object
+            .domain(dateExtent) // &lt;-- convert date string to Date object
             .range([0, WIDTH])
 
         const y = d3.scaleLinear()
@@ -310,7 +338,7 @@ function PurchaseScatterPlot() {
 
               console.log(showDate, showAmount)
             div.style("opacity", "1");
-                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                let fill = "&lt;h1> Date : " + showDate +"&lt;/h1>" + "&lt;h1> Spent : " + showAmount +"&lt;/h1>"
                 console.log(event.pageX)
                 div.html(fill)
                 .style("left", (event.pageX + 10) + "px")
@@ -338,7 +366,7 @@ function PurchaseScatterPlot() {
         console.log(amountExtent)
 
         const x = d3.scaleTime()
-            .domain(dateExtent) // <-- convert date string to Date object
+            .domain(dateExtent) // &lt;-- convert date string to Date object
             .range([0, WIDTH])
 
         const y = d3.scaleLinear()
@@ -385,7 +413,7 @@ function PurchaseScatterPlot() {
               let showAmount = d.amount
               console.log(showDate, showAmount)
             div.style("opacity", "1");
-                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                let fill = "&lt;h1> Date : " + showDate +"&lt;/h1>" + "&lt;h1> Spent : " + showAmount +"&lt;/h1>"
                 div.html(fill)
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 15) + "px");
@@ -451,7 +479,7 @@ function PurchaseScatterPlot() {
               let showAmount = d.amount
               console.log(showDate, showAmount)
             div.style("opacity", "1");
-                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                let fill = "&lt;h1> Date : " + showDate +"&lt;/h1>" + "&lt;h1> Spent : " + showAmount +"&lt;/h1>"
                 console.log(event.pageX)
                 div.html(fill)
                 .style("left", (event.pageX + 10) + "px")
@@ -490,7 +518,7 @@ function PurchaseScatterPlot() {
               let showAmount = d.amount
 
             div.style("opacity", "1");
-                let fill = "<h1> Date : " + showDate +"</h1>" + "<h1> Spent : " + showAmount +"</h1>"
+                let fill = "&lt;h1> Date : " + showDate +"&lt;/h1>" + "&lt;h1> Spent : " + showAmount +"&lt;/h1>"
                 console.log(event.pageX)
                 div.html(fill)
                 .style("left", (event.pageX + 10) + "px")
@@ -536,36 +564,58 @@ function PurchaseScatterPlot() {
 
 
   return (
-    <div>
-          <div ref={divRef}>
-          </div>
-          <svg ref={Chart_Area} width="800" height="500">
-            <g ref={groupRef}>
-              </g>
-              <g ref={Group_Area}  >
-                <text class="y axisLabel" ref={y_Label}></text> 
-                <text class="x axisLabel" ref={x_Label}></text>
-                <g class="x axis" ref={x_axis}></g>
-                <g class="x axis" ref={y_axis}></g>
-                <g class="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"></g>
-              </g>
-            </svg>
-            <div>
-            <FormControl>
-            <RadioGroup
+    &lt;div>
+          &lt;div ref={divRef}>
+          &lt;/div>
+          &lt;svg ref={Chart_Area} width="800" height="500">
+            &lt;g ref={groupRef}>
+              &lt;/g>
+              &lt;g ref={Group_Area}  >
+                &lt;text class="y axisLabel" ref={y_Label}>&lt;/text> 
+                &lt;text class="x axisLabel" ref={x_Label}>&lt;/text>
+                &lt;g class="x axis" ref={x_axis}>&lt;/g>
+                &lt;g class="x axis" ref={y_axis}>&lt;/g>
+                &lt;g class="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end">&lt;/g>
+              &lt;/g>
+            &lt;/svg>
+            &lt;div>
+            &lt;FormControl>
+            &lt;RadioGroup
                 column
                 aria-labelledby="demo-row-radio-buttons-group-label"
                 name="row-radio-buttons-group"
                 defaultValue="overall"
             >
-                <FormControlLabel value="overall" control={<Radio />} label="Overall History" onChange={actionbutton.bind(this)} />
-                <FormControlLabel value="buy" control={<Radio />} label="Purchase History" onChange={actionbutton.bind(this)} />
-                <FormControlLabel value="sell" control={<Radio />} label="Sold History" onChange={actionbutton.bind(this)} />
-                </RadioGroup>
-            </FormControl>
-            </div>
-    </div>
+                &lt;FormControlLabel value="overall" control={&lt;Radio />} label="Overall History" onChange={actionbutton.bind(this)} />
+                &lt;FormControlLabel value="buy" control={&lt;Radio />} label="Purchase History" onChange={actionbutton.bind(this)} />
+                &lt;FormControlLabel value="sell" control={&lt;Radio />} label="Sold History" onChange={actionbutton.bind(this)} />
+                &lt;/RadioGroup>
+            &lt;/FormControl>
+            &lt;/div>
+    &lt;/div>
   )
 }
 
-export default PurchaseScatterPlot
+export default PurchaseScatterPlot</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AnalysisChart">AnalysisChart</a></li><li><a href="global.html#AnalysisPage">AnalysisPage</a></li><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthenticationPage">AuthenticationPage</a></li><li><a href="global.html#BarChartVis">BarChartVis</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#ComparingStocksVis">ComparingStocksVis</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#MachineLearningModel">MachineLearningModel</a></li><li><a href="global.html#Overview">Overview</a></li><li><a href="global.html#PieChartVis">PieChartVis</a></li><li><a href="global.html#Popup">Popup</a></li><li><a href="global.html#PortfolioHeader">PortfolioHeader</a></li><li><a href="global.html#PortfolioSearchResults">PortfolioSearchResults</a></li><li><a href="global.html#PortfolioSummary">PortfolioSummary</a></li><li><a href="global.html#PortfolioTracker">PortfolioTracker</a></li><li><a href="global.html#PurchaseScatterPlot">PurchaseScatterPlot</a></li><li><a href="global.html#Search">Search</a></li><li><a href="global.html#SearchResults">SearchResults</a></li><li><a href="global.html#Signup">Signup</a></li><li><a href="global.html#StackedBarChart">StackedBarChart</a></li><li><a href="global.html#StockSearch">StockSearch</a></li><li><a href="global.html#VisualizationPage">VisualizationPage</a></li><li><a href="global.html#convertDateToUnixTimestamp">convertDateToUnixTimestamp</a></li><li><a href="global.html#convertISODate">convertISODate</a></li><li><a href="global.html#convertUnixTimestampToDate">convertUnixTimestampToDate</a></li><li><a href="global.html#createDate">createDate</a></li><li><a href="global.html#fetchStockOverview">fetchStockOverview</a></li><li><a href="global.html#generateTickerID">generateTickerID</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#insertUser">insertUser</a></li><li><a href="global.html#updateUser">updateUser</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Apr 24 2023 20:10:13 GMT+0800 (Malaysia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

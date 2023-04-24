@@ -3,6 +3,10 @@ import Login from './Login'
 import Signup from './Signup'
 import './Authentication.css'
 
+/**
+ * Adds left and right animation to the login and signup pages
+ * @param {*} props html elements
+ */
 function AuthenticationPage(props) {
 
     const [isLogginActive, setLogginActive] = useState(true)
@@ -10,9 +14,6 @@ function AuthenticationPage(props) {
     const currentActive = isLogginActive ? "Login" : "Sign Up"
     const rightSide = "right"
 
-    function changeState(){
-        // if(isLogginActive)
-    }
 
   return (
     <div className='text-center flex justify-center align-center font-sans w-screen h-screen'>
@@ -21,7 +22,6 @@ function AuthenticationPage(props) {
                 {isLogginActive && <Login contianerRef ={(ref) => current = ref} />}
                 {!isLogginActive && <Signup contianerRef ={(ref) => current = ref} />}
             </div>
-            {/* <RightSide current={current} contianerRef = {(ref) => rightSide = ref} /> */}
         </div>  
     </div>
   )

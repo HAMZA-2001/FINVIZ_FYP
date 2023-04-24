@@ -1,6 +1,11 @@
 import React from 'react';
 import Card from "./Card";
 
+/**
+ * creates a stock details card component
+ * @param {object} details data for the details 
+ * @returns stock details
+ */
 function Details({details}) {
     const detailsList = {
         name: "Name",
@@ -12,6 +17,11 @@ function Details({details}) {
         finnhubIndustry: "Industry",
     }
 
+    /**
+     * convert for millio to billion
+     * @param {*} number number to be converted
+     * @returns converted number
+     */
     const convertMillionToBillion = (number) => {
         return (number/1000).toFixed(2)
     }

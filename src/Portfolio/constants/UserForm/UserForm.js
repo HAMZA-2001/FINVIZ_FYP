@@ -29,8 +29,11 @@ function UserForm({idx}) {
     const [records, setrecords] = useState(userService.getAllUsers())
     const [recordsforedite, setrecordsforedit] = useState(null)
     const {Results, setResults} = useContext(StockPortfolioContext)
-    console.log(idx)
 
+    /**
+     * 
+     * @param {string} e event type
+     */
     const handleInputChange = e => {
         const {name, value} = e.target
         console.log(name)
@@ -44,50 +47,51 @@ function UserForm({idx}) {
 
     }
 
+    /**
+     * Resets the values in the edit form
+     */
     const resetForm = () => {
         setValues(initialFValues)
     }
 
+    /**
+     * 
+     * @param {string} name name of the event
+     * @param {number} value value to fetched
+     * @returns {Object}
+     */
     const convertToDefEventPara = (name, value) => ({
         target: {
             name, value
         }
     })
 
+    /**
+     * Adding the user details
+     * @param {string} user name of the user 
+     * @param {*} restForm 
+     */
     const addOrEdit = (user, restForm) => {
         userService.insertUser(user)
         restForm()
         setOpenPopup(false)
     }
 
+    /**
+     * handles the sumbit request one form is filled
+     */
     const handleSubmit = e => {
-        console.log("clicked")
         e.preventDefault()
         if(values.Action === "sell"){
-            console.log("hello")
-            console.log(-1*values.Shares)
-            console.log(values)
             const newArray = values
             values.Shares = -1*values.Shares
             setValues(values)
-
-            // setValues(
-            //     {
-            //         ...values,
-            //         ["Shares"]: -1*values.Shares //update the changing values
-            //     }
-            // )
-            // values.Shares = toString(-1 * parseInt(values.Shares))
         }
         userService.insertUser(values, idx)
-        // userService.updateUser(values)
-        console.log(values)
-        // addOrEdit(values, resetForm)
         resetForm()
         setOpenPopup(false)
         setrecords(userService.getAllUsers())
         setResults(userService.getAllUsers())
-        console.log(records)
     }
 
   return (

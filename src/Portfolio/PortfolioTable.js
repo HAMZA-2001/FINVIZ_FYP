@@ -12,14 +12,16 @@ import EditStockContext from './EditStockContext'
 import { useAuth } from '../Authentication/context/AuthContext'
 import { writeUserData } from '../firebase'
 import { getDatabase, onValue, push, ref, set, update } from 'firebase/database'
-// import {onSnapshot} from 'firebase/firestore'
+
 
 let tickinDB = 0
 let mylistofStockDetail2 = []
 function PortfolioTable({len}) {
     const {portfoliostockSymbol, setportfoliostockSymbol, Results} = useContext(StockPortfolioContext)
+
     //list of stock details
     const [stockDetails, setStockDetails] = useState([])
+
     //list of stock quotes
     const [quote, setQuote] = useState([])
 
@@ -44,13 +46,13 @@ function PortfolioTable({len}) {
     const [tickerSymbols, setTickerSymbols] = useState()
 
     const {currentUser} = useAuth()
-    console.log(currentUser.uid)
+
 
 const [mylistofStockDetail, setmylistofStockDetail] = useState([])
 
 
 
-// Database stuff
+
 const [getdatabasetickers, setdatabasetickers] = useState([])
 const [refresh, setrefresh] = useState(0)
 const [arrlen, setarrlen] = useState(null)
@@ -58,10 +60,9 @@ let dbtickarrlen = 0
 const [idList, setidstate] = useState([])
 useEffect(()=>{
      onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
-                // setidstate(Object.keys(snapshot.val()))
+
                 let firebaseContents = []
                 Object.values(snapshot.val()).map((project, item) => {  
-                    //  fireba
                         console.log(project)
                     })     
                 })
@@ -76,32 +77,24 @@ const [count, setcount] = useState(null)
 
 useEffect(()=>{
  
-    console.log(len) 
     let mycount = 0
     if (refresh === 1) {
-        console.log(idList)
         const collectionRef = ref(getDatabase(), 'users/' + currentUser.uid + '/tickers')
-        console.log(collectionRef)
-        console.log(collectionRef)
-
-        console.log(refresh)
-        console.log("hi")
        
         let outerarr = []
         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
             console.log("inner")
             Object.values(snapshot.val()).map((project, i) => {
                 mycount = mycount + 1
-                console.log("outer")
-                console.log(project.details)
+
               
-                // setValues((values) => [...values, project])
+                /**
+                 * update all the details for the stocks by fetching data from the apis for each stock in users portfolio so they can view each of their stocks current price and much more
+                 */
                 const updateAllDetails = async () => {
-                  console.log(alldetails)
                     let arr = []
                     try {
                         let result1 = await fetchStockDetails(project.portfoliostockSymbol)
-                        console.log(result1)
                         arr.push(result1)
     
                     } catch (error) {
@@ -109,34 +102,23 @@ useEffect(()=>{
                                         "phone":"00000", "shareOutstanding": 0, "ticker":"-", "weburl":"-"}
 
                         arr.push(notfound)
-                        console.log(error)
                     }
     
                     try {
                         let result2 = await fetchQuote(project.portfoliostockSymbol)
-                        console.log(result2)
                         arr.push(result2)
             
                     } catch (error) {
                         let notfound2 = {"c":0, "d":0, "dp":0, "h":0, "l":0, "o":0, "pc":0, "t":0}
                         arr.push(notfound2)
-                        console.log(error)
                     }
     
                     if (arr.length>0) {
-                        console.log(arr)
-                        // console.log(Aproject.details)
                         arr['Shares'] = project.details
-                        // arr[i]['Shares'] = {Shares: project.details.Shares, AverageCostPerShare:project.details.AverageCostPerShare}
                         outerarr.push(arr)
-                        // setalldetails([...alldetails, arr])
-                                    // setTimeout(() => {
-                                    //     setalldetails([...alldetails, arr])
-                                    // }, 1000);
                      }
 
                   }
-                  console.log(outerarr)
                    updateAllDetails()
 
                    
@@ -144,44 +126,18 @@ useEffect(()=>{
                 })     
             })
 
-            console.log(outerarr.length)
-            // outerarr[i]['Shares'] = {Shares: project.details.Shares, AverageCostPerShare:project.details.AverageCostPerShare}
             let i = 0
-            // while (i < 1001){
-            //     console.log(i)
-            //     i++
-            //     if (i === 1000){
-            //         console.log(outerarr)
-                   
-            //     }
-            // }
+
             setTimeout(() => {
-                console.log(outerarr)
-                console.log(outerarr.length)
-               console.log(alldetails)
                setcount(mycount)
-               //alldetails.slice(0, count).concat(alldetails.slice(2*count+1))
                 setalldetails(outerarr)
-                // setalldetails(outerarr.slice(0, count).concat(alldetails.slice(2*count+1)))
                }, 2000);
     }
-    // console.log("use effect is here")
-    // const mydbtickerlist = []  
-    // onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {    
-    //     Object.values(snapshot.val()).map((project) => {
-    //             mydbtickerlist.push(project.portfoliostockSymbol)   
-    //         })   
-    //         console.log(snapshot)
-    //     })
-        // setdatabasetickers(mydbtickerlist)
         
 }, [refresh])
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // let currentshares = 0
-    // let current_sv = 0
     const [currentshares, setcurrentshares] = useState(null)
     const [current_sv, setcurrent_sv] = useState(null)
 
@@ -189,88 +145,40 @@ useEffect(()=>{
         console.log(event.target.value)
     }
 
+    /**
+     * call a pop up menu
+     * @param {number} idx index chosen
+     * @param {number} shares number of shares
+     * @param {number} shares_value cost of shares
+     * @param {object} e event  
+     */
     function togglePopup(idx, shares, shares_value, e){
-        // currentshares = shares
-        // current_sv = shares_value
         setcurrentshares(shares)
         setcurrent_sv(shares_value)
         setindex(idx)
-        //setrecordsforedit(records[idx])
         setOpenPopup(true)
         setrecords(userService.getAllUsers())
-        console.log(records)
-        console.log("////////////////////////////////")
     }
 
     
 
     let updatedDetailsFlag = true
-    // async function updatefirestore(tickersymbol, results){
-    //     // const updatedDetails = {
-    //     //     details : results
-    //     // }
 
-    //     try{
-    //         // const userRef = ref(getDatabase(), 'users/' + currentUser.uid + '/tickers')
-    //         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
-    //             const listkeys = Object.keys(snapshot.val())
-    //             Object.values(snapshot.val()).map((project, item) => {
-    //                     // console.log(Object.keys(snapshot.val()))
-    //                     if ((project.portfoliostockSymbol === tickersymbol) && (project.details === '')){
-    //                         console.log(project.details)
-    //                         console.log(project.portfoliostockSymbol)
-    //                         const db = getDatabase()
-    //                         const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
-    //                             console.log(updatedDetailsFlag)
-    //                             if(updatedDetailsFlag === true){
-    //                                 updatedDetailsFlag = false
-    //                                 console.log(reference)
-    //                                 update(reference,{
-    //                                     details: results
-    //                                 });
-                                    
-    //                             }
-    //                     }
-                        
-    //                     // if ((project.portfoliostockSymbol === tickersymbol) && (project.details.Shares === currentshares) && (project.details.AverageCostPerShare === current_sv)) {
-    //                     //     console.log('dfsfsfasfdsf')
-    //                     //     const db = getDatabase()
-    //                     //     const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
-    //                     //     if(updatedDetailsFlag === true){
-    //                     //         updatedDetailsFlag = false
-    //                     //         console.log(reference)
-    //                     //         update(reference,{
-    //                     //             details: results    
-    //                     //         });
-                                
-    //                     //     }
-    //                     // }
-    //                      else {
-    //                         console.log("not matched")
-    //                     }
-                        
-    //                 })     
-    //             })
-    //     }catch(error){
-    //         console.log(error)
-    //     }
-    // }
+    /**
+     * store the details of the chosen stock in database
+     * @param {string} tickersymbol ticker symbol which is added to the portfolio
+     * @param {object} results contents to be stored in the database
+     */
     function storeDetailsinDatabase(tickersymbol, results){
         console.log(currentshares, current_sv)
         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
-            console.log(snapshot)
-            console.log(snapshot.val())
             const listkeys = Object.keys(snapshot.val())
             Object.values(snapshot.val()).map((project, item) => {
                     console.log(project)
                     console.log(Object.keys(snapshot.val()))
                     if ((project.portfoliostockSymbol === tickersymbol) && (project.details === '')){
-                        console.log(project.details)
-                        console.log(project.portfoliostockSymbol)
                         const db = getDatabase()
                         const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
-                            // const newPostRef = push(reference);
-                            console.log(updatedDetailsFlag)
                             if(updatedDetailsFlag === true){
                                 updatedDetailsFlag = false
                                 console.log(reference)
@@ -282,7 +190,6 @@ useEffect(()=>{
                     }
                     
                     if ((project.portfoliostockSymbol === tickersymbol) && (project.details.Shares === currentshares) && (project.details.AverageCostPerShare === current_sv)) {
-                        console.log('dfsfsfasfdsf')
                         const db = getDatabase()
                         const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
                         if(updatedDetailsFlag === true){
@@ -300,22 +207,11 @@ useEffect(()=>{
                     
                 })     
             })
-        // const db = getDatabase()
-        // const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
-        // if(portfoliostockSymbol!==""){
-        //     const newPostRef = push(reference);
-        //     set(newPostRef, {
-        //         portfoliostockSymbol,
-                
-        //     });
-        // }
     }
     
 const [clickedstock, setclickedstock] = useState(true)
 const [clicksearch, setclicksearch] = useState(false)
     useEffect(() => {
-        console.log(Results)
-        console.log(alldetails)
         for(let i=0; i<alldetails.length; i++){
             for (let j=0; j< Results.length; j++){
                 console.log(j)
@@ -328,7 +224,6 @@ const [clicksearch, setclicksearch] = useState(false)
                     
 
                     storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])
-                    // updatefirestore(alldetails[i][0].ticker, Results[0])
                     console.log(alldetails[i][0].ticker)
                     alldetails[i]['Shares'] = Results[j]
                     console.log(alldetails)
@@ -336,11 +231,6 @@ const [clicksearch, setclicksearch] = useState(false)
                     console.log(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
                     let l = alldetails.length
                     setalldetails(alldetails.slice(0,l))
-                    // setTimeout(()=>{setalldetails(alldetails.slice(0,l))},1000)
-                    // setalldetails(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
-                    // console.log(alldetails.length)
-                //    setalldetails(alldetails)
-                    //setTimeout(()=>{storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])},2000)
                     
                 }
             }
@@ -348,10 +238,6 @@ const [clicksearch, setclicksearch] = useState(false)
             
         }
 
-        console.log(Results)
-
-        
-        console.log(alldetails)
         localStorage.clear()
     }, [Results])
 
@@ -376,8 +262,7 @@ const [clicksearch, setclicksearch] = useState(false)
             }
 
     
-      
-        console.log(alldetails)
+
      
         if (shouldLog.current === true){
             setclickSearch(true)
@@ -401,8 +286,6 @@ const [clicksearch, setclicksearch] = useState(false)
 
                 if (arr.length>0) {
                     setsearchTimes(searchTimes+1)
-                    console.log(arr)
-                    console.log(alldetails)
                     if(clickedstock===false){
                         setclicksearch(false)
                     }else{
@@ -435,33 +318,33 @@ const [clicksearch, setclicksearch] = useState(false)
               
               }
 
+              /**
+               * fetches the stock curent price data from the api for the users stocks, each time when the stock is added or a page is refreshed
+               */
             const updatePfDetails = async () => {
                 try {
                     const result = await fetchStockDetails(portfoliostockSymbol)
                     const result2 = await fetchQuote(portfoliostockSymbol)
-                    console.log(result)
                     settest1(result)
                     
                     setStockDetails([...stockDetails, result])
-                    // pfresults = result
-                    // setresultname({"tic":result.ticker, "name":result.name})
-        
+ 
                 } catch (error) {
                     setStockDetails([...stockDetails])
-                    console.log(error)
                 }
               }
-        
+              
+              /**
+                * fetches the stock curent overview data from the api for the users stocks, each time when the stock is added or a page is refreshed
+               */
               const updatePfOverview = async () => {
                 try {
                     const result = await fetchQuote(portfoliostockSymbol)
-                    console.log(result)
                     settest2(result)
                     setQuote([...quote, result])
         
                 } catch (error) {
                     setQuote([...quote])
-                    console.log(error)
                 }
               }
               updatePfDetails() // details result
@@ -469,25 +352,11 @@ const [clicksearch, setclicksearch] = useState(false)
               updateAllDetails()
             
               setstockList([...stockList, portfoliostockSymbol])
-            //   itemsList.push({"symbol":portfoliostockSymbol, "data":pfresults})
-           
-        
-              console.log(stockList)
-              console.log(resultname)
-            //   findStockDetails(stockList.slice(1))
-
         }
         else{
-            // setStockDetails({})
             shouldLog.current = true
         }
 
-        console.log(stockList)
-        console.log([...stockDetails])
- 
-       
-      
-    //    writeUserData(currentUser.uid, tickerSymbols, alldetails)
       }, [portfoliostockSymbol])
       
         
@@ -513,59 +382,6 @@ const [clicksearch, setclicksearch] = useState(false)
                     </thead>
                     <tbody>
                     
-                        {/* <tr class="bg-gray-800">
-                            <td class="p-3">
-                                <div class="flex align-items-center">
-                                    <img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80" alt="unsplash image"/>
-                                    <div class="ml-3">
-                                        <div class="">MSFT</div>
-                                        <div class="text-gray-500">Microsoft Corperation</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <div class="flex align-items-center">
-                                    <div class="ml-3">
-                                        <div class="">258.3</div>
-                                        <div class="text-gray-500">Post 258.20</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <div class="flex align-items-center">
-                                    <div class="ml-3">
-                                        <div class="">-6.25</div>
-                                        <div class="text-gray-500">-0.15</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">12</span>
-                            </td>
-                                                        <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">-</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">-</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="text-gray-50 rounded-md px-2">-</span>
-                            </td>
-
-                            <td class="p-3 ">
-                                <a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
-                                    <i class="material-icons-outlined text-base">Edit</i>
-                                </a>
-                                <a href="#" class="text-gray-400 hover:text-red-100  ml-2">
-                                    <i class="material-icons-round text-base">Delete</i>
-                                </a>
-                            </td>
-                        </tr> */}
-                        {/* {console.log(searchTimes)} */}
-                        {console.log(alldetails)}
-                        {console.log(count)}
-
-
 
                         { (count === 0) && alldetails.slice(1).map((item, index) => {
                             console.log(item)
@@ -814,7 +630,7 @@ const [clicksearch, setclicksearch] = useState(false)
             </div>
         </div>
 
-        {/*  */}
+
 
         
         <Popup openPopup = {openPopup} setOpenPopup={setOpenPopup}>

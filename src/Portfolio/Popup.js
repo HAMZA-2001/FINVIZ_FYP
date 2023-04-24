@@ -1,6 +1,10 @@
 import { Button, Dialog, DialogContent, DialogTitle } from '@material-ui/core'
 import React from 'react'
 
+/**
+ * React popup component used for displaying a pop up form when edite button is clicked in user's portfolio.
+ * @component 
+ */
 function Popup(props) {
     const {title, children, openPopup, setOpenPopup} = props
   return (

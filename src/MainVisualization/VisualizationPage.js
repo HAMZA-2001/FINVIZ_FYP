@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from "d3";
 import { dsvFormat, scaleOrdinal, select, zoomTransform } from 'd3';
-import { dark } from '@material-ui/core/styles/createPalette';
 
-
-function App3() {
+/**
+ * React component which shows the visualization page.
+ * @component
+ */
+function VisualizationPage() {
     //volume
     const Volume_Area = useRef()
     const volume_Svg = useRef()
@@ -67,7 +69,6 @@ function App3() {
      const svg = d3.select(Chart_Area.current)
        .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
        .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
-    //    .style("background", '#FCFBF4')
        .style("border-radius", '50px')
        .attr("overflow", "hidden")
 
@@ -127,19 +128,23 @@ function App3() {
             // .ticks(6)
 
     /**
+     * @memberof VisualizationPage
+     * @function getTickerData
      * get the value from the drop down list
-     * @param {*} val -  the value of the event
+     * @param {string} val -  the value of the event
      */
     function getTickerData(val){
         setTickerData(val.target.value)
       }
 
     /**
+     * @memberof global
      * When user clicks the search button for search bar
      * @param {*} e - event 
      */
     function clickTickerData(e){
         const search_ticker = tickerData
+        
         //volume section
         setvolumeData([])
         // remove the previous path element so it doesnt show other lines on the graph  
@@ -652,4 +657,4 @@ function App3() {
   )
 }
 
-export default App3
+export default VisualizationPage

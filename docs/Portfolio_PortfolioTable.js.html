@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Portfolio/PortfolioTable.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Portfolio/PortfolioTable.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { UsersIcon } from '@heroicons/react/solid'
+import { list, Result } from 'postcss'
+import React, { useContext, useLayoutEffect, useRef, useState }  from 'react'
+import { useEffect } from 'react'
+import { fetchQuote, fetchStockDetails } from '../api/stock-api'
+import UserForm from './constants/UserForm/UserForm'
+import Popup from './Popup'
+import PortfolioHeader from './PortfolioHeader'
+import StockPortfolioContext from './StockPortfolioContext'
+import * as userService from "./constants/UserForm/userService"
+import EditStockContext from './EditStockContext'
+import { useAuth } from '../Authentication/context/AuthContext'
+import { writeUserData } from '../firebase'
+import { getDatabase, onValue, push, ref, set, update } from 'firebase/database'
+
+
+let tickinDB = 0
+let mylistofStockDetail2 = []
+function PortfolioTable({len}) {
+    const {portfoliostockSymbol, setportfoliostockSymbol, Results} = useContext(StockPortfolioContext)
+
+    //list of stock details
+    const [stockDetails, setStockDetails] = useState([])
+
+    //list of stock quotes
+    const [quote, setQuote] = useState([])
+
+    //value of stock quotes and details
+    const [test1, settest1] = useState({})
+    const [test2, settest2] = useState({})
+
+    //list of stockdetails and quotes
+    const [alldetails, setalldetails] = useState([])
+    const [stockList, setstockList] = useState([])
+    const [resultname, setresultname] = useState({tic:undefined, name:undefined})
+    
+    let pfresults = {}
+    const shouldLog = useRef(false)
+    const shouldLog2 = useRef(false)
+
+    const [openPopup, setOpenPopup] = useState(false)
+    const [records, setrecords] = useState(userService.getAllUsers())
+
+    const [recordsforedit, setrecordsforedit] = useState(null)
+    const [index, setindex] = useState(null) 
+    const [tickerSymbols, setTickerSymbols] = useState()
+
+    const {currentUser} = useAuth()
+
+
+const [mylistofStockDetail, setmylistofStockDetail] = useState([])
+
+
+
+
+const [getdatabasetickers, setdatabasetickers] = useState([])
+const [refresh, setrefresh] = useState(0)
+const [arrlen, setarrlen] = useState(null)
+let dbtickarrlen = 0
+const [idList, setidstate] = useState([])
+useEffect(()=>{
+     onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+
+                let firebaseContents = []
+                Object.values(snapshot.val()).map((project, item) => {  
+                        console.log(project)
+                    })     
+                })
+
+
+    setrefresh(refresh+1)
+},[])
+
+const [values, setValues] = useState([])
+const [count, setcount] = useState(null)
+
+
+useEffect(()=>{
+ 
+    let mycount = 0
+    if (refresh === 1) {
+        const collectionRef = ref(getDatabase(), 'users/' + currentUser.uid + '/tickers')
+       
+        let outerarr = []
+        onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+            console.log("inner")
+            Object.values(snapshot.val()).map((project, i) => {
+                mycount = mycount + 1
+
+              
+                /**
+                 * update all the details for the stocks by fetching data from the apis for each stock in users portfolio so they can view each of their stocks current price and much more
+                 */
+                const updateAllDetails = async () => {
+                    let arr = []
+                    try {
+                        let result1 = await fetchStockDetails(project.portfoliostockSymbol)
+                        arr.push(result1)
+    
+                    } catch (error) {
+                        let notfound = {'country':'-', "currency":"-", "estimateCurrency":"-", "exchange":"-", "finnhubIndustry":"-", "ipo":"-", "logo": "-", "marketCapitalization": 0, "name": "-",
+                                        "phone":"00000", "shareOutstanding": 0, "ticker":"-", "weburl":"-"}
+
+                        arr.push(notfound)
+                    }
+    
+                    try {
+                        let result2 = await fetchQuote(project.portfoliostockSymbol)
+                        arr.push(result2)
+            
+                    } catch (error) {
+                        let notfound2 = {"c":0, "d":0, "dp":0, "h":0, "l":0, "o":0, "pc":0, "t":0}
+                        arr.push(notfound2)
+                    }
+    
+                    if (arr.length>0) {
+                        arr['Shares'] = project.details
+                        outerarr.push(arr)
+                     }
+
+                  }
+                   updateAllDetails()
+
+                   
+
+                })     
+            })
+
+            let i = 0
+
+            setTimeout(() => {
+               setcount(mycount)
+                setalldetails(outerarr)
+               }, 2000);
+    }
+        
+}, [refresh])
+
+
+
+    const [currentshares, setcurrentshares] = useState(null)
+    const [current_sv, setcurrent_sv] = useState(null)
+
+    function DeleteButton(event){
+        console.log(event.target.value)
+    }
+
+    /**
+     * call a pop up menu
+     * @param {number} idx index chosen
+     * @param {number} shares number of shares
+     * @param {number} shares_value cost of shares
+     * @param {object} e event  
+     */
+    function togglePopup(idx, shares, shares_value, e){
+        setcurrentshares(shares)
+        setcurrent_sv(shares_value)
+        setindex(idx)
+        setOpenPopup(true)
+        setrecords(userService.getAllUsers())
+    }
+
+    
+
+    let updatedDetailsFlag = true
+
+    /**
+     * store the details of the chosen stock in database
+     * @param {string} tickersymbol ticker symbol which is added to the portfolio
+     * @param {object} results contents to be stored in the database
+     */
+    function storeDetailsinDatabase(tickersymbol, results){
+        console.log(currentshares, current_sv)
+        onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
+            const listkeys = Object.keys(snapshot.val())
+            Object.values(snapshot.val()).map((project, item) => {
+                    console.log(project)
+                    console.log(Object.keys(snapshot.val()))
+                    if ((project.portfoliostockSymbol === tickersymbol) &amp;&amp; (project.details === '')){
+                        const db = getDatabase()
+                        const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
+                            if(updatedDetailsFlag === true){
+                                updatedDetailsFlag = false
+                                console.log(reference)
+                                update(reference,{
+                                    details: results
+                                });
+                                
+                            }
+                    }
+                    
+                    if ((project.portfoliostockSymbol === tickersymbol) &amp;&amp; (project.details.Shares === currentshares) &amp;&amp; (project.details.AverageCostPerShare === current_sv)) {
+                        const db = getDatabase()
+                        const reference = ref(db, 'users/' + currentUser.uid + '/tickers/' + listkeys[item])
+                        if(updatedDetailsFlag === true){
+                            updatedDetailsFlag = false
+                            console.log(reference)
+                            update(reference,{
+                                details: results    
+                            });
+                            
+                        }
+                    }
+                     else {
+                        console.log("not matched")
+                    }
+                    
+                })     
+            })
+    }
+    
+const [clickedstock, setclickedstock] = useState(true)
+const [clicksearch, setclicksearch] = useState(false)
+    useEffect(() => {
+        for(let i=0; i&lt;alldetails.length; i++){
+            for (let j=0; j&lt; Results.length; j++){
+                console.log(j)
+                if(i === Results[j].id){ 
+                    if(clicksearch === true){
+                        setclickedstock(true)
+                    }else{
+                        setclickedstock(false)
+                    }
+                    
+
+                    storeDetailsinDatabase(alldetails[i][0].ticker, Results[0])
+                    console.log(alldetails[i][0].ticker)
+                    alldetails[i]['Shares'] = Results[j]
+                    console.log(alldetails)
+
+                    console.log(alldetails.slice(0, count).concat(alldetails.slice(2*count+1)))
+                    let l = alldetails.length
+                    setalldetails(alldetails.slice(0,l))
+                    
+                }
+            }
+
+            
+        }
+
+        localStorage.clear()
+    }, [Results])
+
+
+ 
+
+    const [clickedsearch, setclickSearch] = useState(false)
+    const [searchTimes, setsearchTimes] = useState(0)
+    
+    useEffect(() => {
+
+
+            const db = getDatabase()
+            const reference = ref(db, 'users/' + currentUser.uid + '/tickers')
+            if(portfoliostockSymbol!==""){
+                const newPostRef = push(reference);
+                set(newPostRef, {
+                    portfoliostockSymbol,
+                    details: ""
+                    
+                });
+            }
+
+    
+
+     
+        if (shouldLog.current === true){
+            setclickSearch(true)
+            const updateAllDetails = async () => {
+                let arr = []
+                try {
+                    let result1 = await fetchStockDetails(portfoliostockSymbol)
+                    arr.push(result1)
+
+                } catch (error) {
+                    console.log(error)
+                }
+
+                try {
+                    let result2 = await fetchQuote(portfoliostockSymbol)
+                    arr.push(result2)
+        
+                } catch (error) {
+                    console.log(error)
+                }
+
+                if (arr.length>0) {
+                    setsearchTimes(searchTimes+1)
+                    if(clickedstock===false){
+                        setclicksearch(false)
+                    }else{
+                        setclicksearch(true)
+                    }
+                    
+                    if (alldetails.length>0){
+                        console.log(alldetails)
+                        alldetails.map((items)=>{
+                            console.log(items)
+                        })   
+                    }
+
+
+                    setTimeout(
+                        () => {
+                            console.log(alldetails)
+                            console.log(alldetails.length)
+                            setalldetails([...alldetails, arr])         
+                            console.log(alldetails)
+                            console.log(alldetails.length)
+
+        
+                        },
+                        2000
+                    )
+                    
+                }
+
+              
+              }
+
+              /**
+               * fetches the stock curent price data from the api for the users stocks, each time when the stock is added or a page is refreshed
+               */
+            const updatePfDetails = async () => {
+                try {
+                    const result = await fetchStockDetails(portfoliostockSymbol)
+                    const result2 = await fetchQuote(portfoliostockSymbol)
+                    settest1(result)
+                    
+                    setStockDetails([...stockDetails, result])
+ 
+                } catch (error) {
+                    setStockDetails([...stockDetails])
+                }
+              }
+              
+              /**
+                * fetches the stock curent overview data from the api for the users stocks, each time when the stock is added or a page is refreshed
+               */
+              const updatePfOverview = async () => {
+                try {
+                    const result = await fetchQuote(portfoliostockSymbol)
+                    settest2(result)
+                    setQuote([...quote, result])
+        
+                } catch (error) {
+                    setQuote([...quote])
+                }
+              }
+              updatePfDetails() // details result
+              updatePfOverview() // quote result
+              updateAllDetails()
+            
+              setstockList([...stockList, portfoliostockSymbol])
+        }
+        else{
+            shouldLog.current = true
+        }
+
+      }, [portfoliostockSymbol])
+      
+        
+  return (
+    
+    
+    &lt;div className='relative overflow-hidden rounded-lg border border-gray-200 shadow-md w-full'>
+        {console.log(alldetails)}
+        &lt;div class="overflow-hidden rounded-lg border border-gray-200 shadow-md w-full">
+            &lt;div class="w-full border-collapse bg-white text-left text-sm text-gray-500">
+                &lt;table class="table  text-gray-400 space-y-6 text-sm w-full">
+                    &lt;thead class="bg-gray-800 text-gray-500">
+                        &lt;tr>
+                            &lt;th class="p-3 text-left">Symbol&lt;/th>
+                            &lt;th class="p-3 text-left">Price&lt;/th>
+                            &lt;th class="p-3 text-left">Change %&lt;/th>
+                            &lt;th class="p-3 text-left">Shares&lt;/th>
+                            &lt;th class="p-3 text-left">Share Value ($)&lt;/th>
+                            &lt;th class="p-3 text-left">Total Cost/Transection ($)&lt;/th>
+                            &lt;th class="p-3 text-left">Today's Gain&lt;/th>
+                            &lt;th class="p-3 text-left">Action&lt;/th>
+                        &lt;/tr>
+                    &lt;/thead>
+                    &lt;tbody>
+                    
+
+                        { (count === 0) &amp;&amp; alldetails.slice(1).map((item, index) => {
+                            console.log(item)
+                            return (
+                                &lt;tr class="bg-gray-800" key={index}>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=634&amp;q=80" alt="unsplash image"/>
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item[0].ticker}&lt;/div>
+                                        &lt;div class="text-gray-500">{item[0].name}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].pc)}&lt;/div> 
+                                        &lt;div class="text-gray-500">Post 258.20&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].d)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare * item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3 ">
+                                &lt;a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
+                                    &lt;i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index+1, item['Shares'] &amp;&amp; item['Shares'].Shares, item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare)}>Edit&lt;/i>
+                                &lt;/a>
+                                &lt;button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    &lt;i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete&lt;/i>
+                                &lt;/button>
+                            &lt;/td>
+                        &lt;/tr>
+
+                            )
+                        }
+                        ) 
+                        }
+                       
+                        { (clickedstock===true &amp; count>0)&amp;&amp;alldetails.slice(0,count).map((item, index) => {
+                            return (
+                                &lt;tr class="bg-gray-800" key={index}>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=634&amp;q=80" alt="unsplash image"/>
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item[0].ticker}&lt;/div>
+                                        &lt;div class="text-gray-500">{item[0].name}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].pc === undefined) ? 0 : item[1].pc}&lt;/div> 
+                                        &lt;div class="text-gray-500">Post 258.20&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].d)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare * item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3 ">
+                                &lt;a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
+                                    &lt;i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index, item['Shares'] &amp;&amp; item['Shares'].Shares, item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare)}>Edit&lt;/i>
+                                &lt;/a>
+                                &lt;button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    &lt;i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete&lt;/i>
+                                &lt;/button>
+                            &lt;/td>
+                        &lt;/tr>
+
+                            )
+                        }
+                        ) 
+                        }
+
+                        {(clickedstock===true &amp; count>0) &amp;&amp; alldetails.slice(2*count+1).map((item, index) => {
+                            return (
+                                &lt;tr class="bg-gray-800" key={index}>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;img class="rounded-full h-12 w-12  object-cover" src="https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=634&amp;q=80" alt="unsplash image"/>
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item[0].ticker}&lt;/div>
+                                        &lt;div class="text-gray-500">{item[0].name}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].pc === undefined) ? 0 : item[1].pc}&lt;/div> 
+                                        &lt;div class="text-gray-500">Post 258.20&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].d)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare * item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3 ">
+                                &lt;a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
+                                    &lt;i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, ((index+1) + 2*count), item['Shares'] &amp;&amp; item['Shares'].Shares, item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare)}>Edit&lt;/i>
+                                &lt;/a>
+                                &lt;button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    &lt;i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete&lt;/i>
+                                &lt;/button>
+                            &lt;/td>
+                        &lt;/tr>
+
+                            )
+                        }
+                        ) 
+                        }
+                        
+                        { (clickedstock===false &amp; count>0)&amp;&amp;alldetails.map((item, index) => {
+                            return (
+                                &lt;tr class="bg-gray-800" key={index}>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;img class="rounded-full h-12 w-12  object-cover" src={"https://images.unsplash.com/photo-1613588718956-c2e80305bf61?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=634&amp;q=80"} alt="unsplash image"/>
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item[0].ticker}&lt;/div>
+                                        &lt;div class="text-gray-500">{item[0].name}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].pc === undefined) ? 0 : item[1].pc}&lt;/div> 
+                                        &lt;div class="text-gray-500">Post 258.20&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{(item[1].d)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item[1].d/item[1].pc)*100).toFixed(2).toString()+"%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;span class="text-gray-50 rounded-md px-2">{item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare * item['Shares'].Shares}&lt;/span>
+                            &lt;/td>
+                            &lt;td class="p-3">
+                                &lt;div class="flex align-items-center">
+                                    &lt;div class="ml-3">
+                                        &lt;div class="">{item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares).toFixed(2)}&lt;/div>
+                                        &lt;div class="text-gray-500">{((item['Shares'] &amp;&amp; (item[1].pc* item['Shares'].Shares - item['Shares'].AverageCostPerShare * item['Shares'].Shares)/ (item['Shares'].AverageCostPerShare * item['Shares'].Shares)) * 100).toFixed(2).toString() + "%"}&lt;/div>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/td>
+                            &lt;td class="p-3 ">
+                                &lt;a href="#" class="text-gray-400 hover:text-gray-100  mx-2">
+                                    &lt;i class="material-icons-outlined text-base" onClick={togglePopup.bind(this, index, item['Shares'] &amp;&amp; item['Shares'].Shares, item['Shares'] &amp;&amp; item['Shares'].AverageCostPerShare)}>Edit&lt;/i>
+                                &lt;/a>
+                                &lt;button href="#" class="text-gray-400 hover:text-red-100  ml-2">
+                                    &lt;i class="material-icons-round text-base" value="yo" onClick={(DeleteButton.bind(this))}>Delete&lt;/i>
+                                &lt;/button>
+                            &lt;/td>
+                        &lt;/tr>
+
+                            )
+                        }
+                        ) 
+                        }
+
+                        
+                    &lt;/tbody>
+                &lt;/table>
+            &lt;/div>
+        &lt;/div>
+
+
+
+        
+        &lt;Popup openPopup = {openPopup} setOpenPopup={setOpenPopup}>
+           
+            &lt;UserForm idx = {index} setOpenPopup={setOpenPopup}/>
+            
+        &lt;/Popup>
+
+    &lt;/div>
+
+  )
+}
+
+export default PortfolioTable</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AnalysisChart">AnalysisChart</a></li><li><a href="global.html#AnalysisPage">AnalysisPage</a></li><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthenticationPage">AuthenticationPage</a></li><li><a href="global.html#BarChartVis">BarChartVis</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#ComparingStocksVis">ComparingStocksVis</a></li><li><a href="global.html#Dashboard">Dashboard</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#MachineLearningModel">MachineLearningModel</a></li><li><a href="global.html#Overview">Overview</a></li><li><a href="global.html#PieChartVis">PieChartVis</a></li><li><a href="global.html#Popup">Popup</a></li><li><a href="global.html#PortfolioHeader">PortfolioHeader</a></li><li><a href="global.html#PortfolioSearchResults">PortfolioSearchResults</a></li><li><a href="global.html#PortfolioSummary">PortfolioSummary</a></li><li><a href="global.html#PortfolioTracker">PortfolioTracker</a></li><li><a href="global.html#PurchaseScatterPlot">PurchaseScatterPlot</a></li><li><a href="global.html#Search">Search</a></li><li><a href="global.html#SearchResults">SearchResults</a></li><li><a href="global.html#Signup">Signup</a></li><li><a href="global.html#StackedBarChart">StackedBarChart</a></li><li><a href="global.html#StockSearch">StockSearch</a></li><li><a href="global.html#VisualizationPage">VisualizationPage</a></li><li><a href="global.html#convertDateToUnixTimestamp">convertDateToUnixTimestamp</a></li><li><a href="global.html#convertISODate">convertISODate</a></li><li><a href="global.html#convertUnixTimestampToDate">convertUnixTimestampToDate</a></li><li><a href="global.html#createDate">createDate</a></li><li><a href="global.html#fetchStockOverview">fetchStockOverview</a></li><li><a href="global.html#generateTickerID">generateTickerID</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#insertUser">insertUser</a></li><li><a href="global.html#updateUser">updateUser</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Apr 24 2023 20:10:13 GMT+0800 (Malaysia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

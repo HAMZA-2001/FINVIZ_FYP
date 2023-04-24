@@ -2,6 +2,11 @@ import { symbol } from 'd3'
 import React, { useContext } from 'react'
 import StockContext from './StockContext'
 
+/**
+ * lists the results of the search
+ * @param {object} param0 results data
+ * @returns displays results data in form on a list
+ */
 function SearchResults({results}) {
     const {setStockSymbol} = useContext(StockContext)
   return (

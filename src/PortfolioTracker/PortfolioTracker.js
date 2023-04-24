@@ -8,6 +8,11 @@ import StackedBarChart from './StackedBarChart';
 import * as xlsx from 'xlsx';
 import PurchaseScatterPlot from './PurchaseScatterPlot';
 
+/**
+ * converts any date in ISO format
+ * @param {*} isodate date string to be converted
+ * @returns date in ISO format
+ */
 function convertISODate(isodate){
     const date = new Date(isodate);
     const year = date.getFullYear();
@@ -16,18 +21,11 @@ function convertISODate(isodate){
     return `${year}-${month}-${day}`;
 }
 
-// async function fetchStockOverview(symbol) {
-//     const response = await fetch(
-//       `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=R6DXIM881UZRQGUU`
-//     );
-
-//     if(!response.ok){
-//         const message = `An error has occured: ${response.status}`
-//         throw new Error(message);
-//     }
-//     return response.json();
-//   }
-
+/**
+ * fetch stock overview for each stock 
+ * @param {string} symbol ticker symbol  
+ * @returns api response for the request
+ */
 const fetchStockOverview = async (symbol) => {
     const URL = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=R6DXIM881UZRQGUU`;
     const response = await fetch(URL);
@@ -40,25 +38,20 @@ const fetchStockOverview = async (symbol) => {
     return await response.json();
 }
 
+/**
+ * A consolidated view of the portfolio along with visualizations
+ * @returns a summary table with many viusalizations
+ */
 function PortfolioTracker() {
-    const [marketCap, setMarketCap] = useState(null)
+
     const [dbItems, setdbItems] = useState([]) 
     const [filteredList, setFilteredList] = useState([]) 
     const {currentUser} = useAuth()
 
-                    //     let apidata = fetchStockOverview(project.portfoliostockSymbol)
-                    // console.log(apidata)
-                    // const updateStockOverview = async () => {
-                    //     try {
-                    //         const result = await fetchQuote(stockSymbol)
-                    //         setQuote(result);
-                    //     } catch (error) {
-                    //         setQuote({})
-                    //         console.log(error)
-                    //     }
-                    // }
-
-
+    /**
+     * reterive the users data from the database
+     * @returns list of the fetched data
+     */
    function reteriveData(){
         let dbcontents = []
         onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
@@ -68,7 +61,6 @@ function PortfolioTracker() {
                 })     
             }
             )
-        // setdbItems(dbcontents)
         return dbcontents
     }
 
@@ -90,20 +82,12 @@ function PortfolioTracker() {
                 if(comparestockArray.includes(item.portfoliostockSymbol)){
                     comparestockArray.forEach((stock, j)=>{
                         if(stock === item.portfoliostockSymbol){
-                            console.log(item)
-                            console.log(stock)
-                            console.log(j)
-                            console.log(stockArray[i])
-                            console.log(stockArray[j].Total_Cost)
-                            // console.log()
-                            //combination logic goes here
                             
                             stockArray[j].Total_Shares =  parseInt(stockArray[j].Total_Shares) + parseInt(item.details.Shares)
                             stockArray[j].Total_Cost =  parseInt(stockArray[j].Total_Cost) + parseInt(item.details.AverageCostPerShare * item.details.Shares)
                             stockArray[j].AverageCostPerShare =  (parseInt(stockArray[j].Total_Shares) === 0)? 0 : parseInt(stockArray[j].Total_Cost) / parseInt(stockArray[j].Total_Shares)
                             
                             // filtering the dates for the object 
-                            let datesList = []
                             if(item.details.Action === "sell"){
             
                                 if(item.details.Last_Sell_Date === undefined){
@@ -111,8 +95,7 @@ function PortfolioTracker() {
                                 }else{
                                     const x = new Date(item.details.date) // the current date
                                     const y = new Date(stockArray[j].Last_Sell_Date) // the previous sell date
-                                    console.log(x)
-                                    console.log(y)
+
                                     //if x is more recent than y
                                     if (x>y){
                                         stockArray[j].Last_Sell_Date = convertISODate(x)
@@ -120,16 +103,16 @@ function PortfolioTracker() {
                                 }
 
                             }else{
-                                const x = new Date(item.details.date) // 
-                                const y = new Date(stockArray[j].First_Buy_Date) // 
-                                const z = new Date(stockArray[j].Last_Buy_Date) // 
+                                const x = new Date(item.details.date) 
+                                const y = new Date(stockArray[j].First_Buy_Date) 
+                                const z = new Date(stockArray[j].Last_Buy_Date) 
+
                                 // if the array detects a buy purchase
                                 if(item.details.Last_Sell_Date === ''){
                                     stockArray[j].Last_Sell_Date = convertISODate(item.details.date)
                                 }else{
                                     
-                                    console.log(x)
-                                    console.log(y)
+
                                     //if current date is lesser than previous first buy date
                                     if (x<y){
                                         stockArray[j].First_Buy_Date = convertISODate(x)
@@ -142,8 +125,7 @@ function PortfolioTracker() {
 
                         }
                     })
-                    console.log(item.portfoliostockSymbol)
-                    console.log("includes")
+
                     
                 }else{
                     comparestockArray.push(item.portfoliostockSymbol)
@@ -172,9 +154,6 @@ function PortfolioTracker() {
                 }
             }          
         })
-        // console.log(stockArray)
-        // console.log(comparestockArray)
-        console.log(dbItems)
 
         setTimeout(()=>{
             setFilteredList(stockArray)
@@ -187,44 +166,14 @@ function PortfolioTracker() {
     let results = []
     let URLList = []
     let dlist = []
-    useEffect(()=>{  
-      console.log(filteredList)
 
-        const fetchdata = async (symbol) => {
-            const URL = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`;
-            const response = await fetch(URL);
-            if(!response.ok){
-                const message = `An error has occured: ${response.status}`
-                throw new Error(message);
-            }
-        
-            return await response.json();
-        }
-        
-        const updatePfOverview = async (symbol) => {
-            try {
-                const result = await fetchdata(symbol)
-                results.push(result)
-              
-            } catch (error) {
-                console.log(error)
-            }
-          }
+    useEffect(()=>{  
 
           filteredList.forEach((item, index)=>{
-                // URLList.push(`https://finnhub.io/api/v1/stock/profile2?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
-                // updatePfOverview(item.Symbol)
                 let datafile = fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
                 URLList.push(datafile)
           })
 
-            // setTimeout(()=>{
-            //     console.log("hi")
-            //     console.log(results)
-            // },3000)
-            
-        
-            
             if(URLList.length === filteredList.length){
                 console.log(URLList)
                 Promise.all(URLList).then(function (responses){
@@ -250,7 +199,7 @@ function PortfolioTracker() {
             setTimeout(()=>{setstockOverview(dlist)},1000)
     },[filteredList])
 
-//https://finnhub.io/api/v1/quote?symbol=MSFT&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0
+
     const [stockQuote, setstockQuote] = useState([])
     let QuoteURLList = []
     let qlist = [] 
@@ -258,25 +207,16 @@ function PortfolioTracker() {
         console.log(stockOverview)
 
         filteredList.forEach((item, index)=>{
-            // URLList.push(`https://finnhub.io/api/v1/stock/profile2?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
-            // updatePfOverview(item.Symbol)
             let datafile = fetch(`https://finnhub.io/api/v1/quote?symbol=${item.Symbol}&token=ce56182ad3ifdvthsqtgce56182ad3ifdvthsqu0`)
-            // QuoteURLList.push({
-            //     "ticker": item.Symbol,
-            //     "data": datafile
-            // })
             QuoteURLList.push(datafile)
       })
 
         if(QuoteURLList.length === filteredList.length){
-            console.log(QuoteURLList)
             Promise.all(QuoteURLList).then(function (responses){
-                console.log(responses)
                 responses.forEach((item, i)=>{
                     process2(item.json(), filteredList[i].Symbol)
                 })
             }).catch(function (error) {
-                // if there's an error, log it
                 console.log(error);
             });
         }
@@ -297,15 +237,10 @@ function PortfolioTracker() {
     //capture everything into one list
     const [summary, setSummary] = useState([])
     useEffect(()=>{
-        console.log(filteredList)
-        console.log(stockOverview)
-        console.log(stockQuote)
         const StocksSummary = filteredList
-        console.log(StocksSummary)
         StocksSummary.forEach((summary, i)=>{
             stockOverview.forEach((overview, j)=>{
                 if(summary.Symbol === overview.ticker){
-                    // console.log(summary.Symbol, overview.ticker)
                     StocksSummary[i]["Sector"] = overview.finnhubIndustry
                     StocksSummary[i]["name"] = overview.name
                     StocksSummary[i]["marketcap"] = overview.marketCapitalization
@@ -330,11 +265,6 @@ function PortfolioTracker() {
             })
         })
 
-        // StocksSummary.forEach((item, index)=>{
-            
-        // })
-       
-
         setTimeout(()=>{
             console.log(StocksSummary)
             setSummary(StocksSummary)
@@ -344,6 +274,7 @@ function PortfolioTracker() {
     const[allocationSum, setallocationSum] = useState(0)
     const[paidamoutSum, setpaidamountSum] = useState(0)
     const[totalreturnSum, settotalreturnSum] = useState(0)
+
     useEffect(()=>{
         let t = 0
         let t2 = 0
@@ -358,6 +289,10 @@ function PortfolioTracker() {
         settotalreturnSum(t3)
     },[summary])
 
+    /**
+     * export the extended contents of the table in a excel workbook 
+     * @param {object} event event type
+     */
     function exportToExcel(event){
         console.log("exporting...")
         console.log(summary)

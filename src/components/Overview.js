@@ -1,8 +1,11 @@
 import React from 'react'
 import Card from "./Card";
+/**
+ * Overview of table for the searched stock
+ * @param {object} param0 values to be placed in table 
+ * @returns a card component
+ */
 function Overview({ symbol, price, change, changePercent, currency }) {
-
-
   return (
     <Card>
       <span className="absolute left-4 top-4 text-neutral-400 text-lg xl:text-xl 2xl:text-2xl">

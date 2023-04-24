@@ -1,8 +1,5 @@
 import ChartCard from './ChartCard'
 import React, { useContext, useState, useEffect } from 'react'
-import { mockHistoricalData } from '../constants/mock'
-// import ChartFilter from "./ChartFilter";
-
 import {
     Area,
     XAxis,
@@ -13,8 +10,6 @@ import {
   } from "recharts";
 import { chartConfig } from '../constants/config';
 import ChartFilter from './ChartFilter';
-//   import ThemeContext from "../context/ThemeContext";
-//   import StockContext from "../context/StockContext";
 import {convertUnixTimestampToDate, convertDateToUnixTimestamp, createDate} from "./date-helper"
 import {fetchHistoricalData} from "../api/stock-api"
 import StockContext from "./StockContext";

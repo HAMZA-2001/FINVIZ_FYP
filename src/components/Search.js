@@ -4,17 +4,26 @@ import {XIcon, SearchIcon} from "@heroicons/react/solid";
 import SearchResults from './SearchResults';
 import {searchSymbols} from "../api/stock-api";
 
+/**
+ * Search Bar Component
+ * @returns a searchbar which can list recommeded values
+ */
 function Search() {
     const [input, setInput] = useState("");
     const [bestMatches, setBestMatches] = useState([]);
 
+    /**
+     * clear the contents of the search bar
+     */
     const clear = () => {
         setInput("")
         setBestMatches([])
     }
 
+    /**
+     * updates the best results for the given input
+     */
     const updateBestMatches = async () => {
-        // setBestMatches(mockSearchResults.result);
         try{
             if (input){
                 const SearchResults = await searchSymbols(input)
@@ -24,7 +33,6 @@ function Search() {
 
         }catch(error){
         setBestMatches([])
-        console.log(error)
         }
        
     }

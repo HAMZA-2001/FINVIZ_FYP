@@ -3,25 +3,15 @@ import React, { useState } from 'react'
 import StockPortfolioContext from './StockPortfolioContext'
 import StockSearch from './StockSearch'
 
-
+/**
+ * React component for displaying the header in portoflio page
+ * @component
+ */
 function PortfolioHeader({symbol, price, name}) {
     
     const [todaysGain, settodaysGain] = useState(0)
     const [percentChange, setPercentChange] = useState(0)
     const [todaysValue, settodaysValue] = useState(0)
-
-    // useEffect(() => {
-    //     let tg = 0
-    //     let tp = 0
-    //     let tv = 0
-    //     onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
-         
-    //         Object.values(snapshot.val()).map((project, item) => {  
-    //                 console.log(project)
-    //             })     
-    //         })
-    
-    // }, [])
     
   return (
     <div className='header_container flex flex-col justify-center'>
@@ -41,9 +31,6 @@ function PortfolioHeader({symbol, price, name}) {
 
         </div>   
     </div>
-
-        
-
     </div>
 
   )

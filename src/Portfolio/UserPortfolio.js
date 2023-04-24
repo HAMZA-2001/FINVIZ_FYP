@@ -15,38 +15,7 @@ function UserPortfolio() {
     const [stockDetails, setStockDetails] = useState({})
     const [quote, setQuote] = useState({})
 
-    const [number, setNumber] = useState(0)
-    const {currentUser} = useAuth()
 
-    // Variables for going to prev and next pages in tables
-    const [next, setNext] = useState(false)
-    // const lentickerArray = useMemo(() => {
-    //   return getTAlen(number)
-    // }, [number]) 
-
-
-    // function getTAlen(num){
-    //   // slow function
-    //   onValue(ref(getDatabase(), 'users/' + currentUser.uid + '/tickers'), (snapshot) => {
-    //     // Object.values(snapshot.val()).map((project) => {
-          
-    //     //       num = num + 1
-    //     //       console.log(num)
-
-    //     //     })     
-    //     console.log(snapshot)
-    //     })
-        
-    //     return num
-    // }
-    function TransectionsInput(e){
-      setNext(false)
-    }
-
-    function handleStockTrackerInput(e){
-      setNext(true)
-      console.log(e.target)
-    }
     
     useEffect(() => {
       const updatePfDetails = async () => {
@@ -56,7 +25,6 @@ function UserPortfolio() {
 
         } catch (error) {
             setStockDetails({})
-            console.log(error)
         }
       }
 
@@ -67,7 +35,6 @@ function UserPortfolio() {
 
         } catch (error) {
             setStockDetails({})
-            console.log(error)
         }
       }
       updatePfDetails()

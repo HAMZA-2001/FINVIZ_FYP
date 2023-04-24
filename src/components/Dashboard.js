@@ -8,8 +8,11 @@ import {useContext, useEffect, useState} from 'react';
 import DashboardChart from './DashboardChart';
 import { fetchQuote, fetchStockDetails } from '../api/stock-api';
 import StockContext from './StockContext';
-// import './Dashboard'
 
+/**
+ * Makes the whole of dashbord page
+ * @returns a dashboad consisting of area chart detail tables and smart search bar
+ */
 function Dashboard() {
     const [StockDetails, setStockDetails] = useState({})
     const {stockSymbol} = useContext(StockContext)

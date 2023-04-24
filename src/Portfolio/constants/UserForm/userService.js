@@ -1,15 +1,20 @@
+/**
+ * insert the user into local storage
+ * @param {string} data data from the form to be set 
+ * @param {*} key an id of the given data
+ */
 export function insertUser(data, key){
     let tickers = getAllUsers() // gets the content of the form
     data['id'] = key // increment id by one 
-    console.log(tickers)
-    console.log(data)
-    console.log(data)
     tickers.push(data)
     localStorage.setItem('users', JSON.stringify(tickers))
 }
 
 
-
+/**
+ * generates a unique ticker ID once called
+ * @returns ticker ID
+ */
 export function generateTickerID(){
     if (localStorage.getItem('usersID') == null){
          localStorage.setItem('usersID', '0')
@@ -19,25 +24,26 @@ export function generateTickerID(){
     return id
 }
 
-
+/**
+ * update the content stored in the local storage of the user
+ * @param {string} data the data to be updated
+ */
 export function updateUser(data){
-    console.log("............................")
     if (users === []){
         
     }
     let users = getAllUsers()
-    console.log(data)
-    console.log(users)
     let recordIndex = users.findIndex(x => x.id == data.id)
-    console.log(recordIndex)
     users[recordIndex] = {...data}
     localStorage.setItem('users', JSON.stringify(users))
 }
 
+/**
+ * Get the data for all users
+ * @returns {object} json object of the user details
+ */
 export function getAllUsers(){
-    console.log("here")
     if (localStorage.getItem('users') == null){
-        console.log("here")
         localStorage.setItem('users', JSON.stringify([]))
     }
     return JSON.parse(localStorage.getItem('users'))

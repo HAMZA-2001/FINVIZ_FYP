@@ -4,6 +4,11 @@ import { XIcon, SearchIcon } from '@heroicons/react/solid'
 import PortfolioSearchResults from './PortfolioSearchResults'
 import { searchSymbols } from '../api/stock-api'
 
+/**
+ * display search bar which shows list of all the related stocks 
+ * @component
+ * @returns a search bar which produces list of all the related stocks
+ */
 function StockSearch() {
 
     // for users query what company stocks are they looking for
@@ -16,6 +21,9 @@ function StockSearch() {
         setBestMatches([])
     }
 
+    /**
+     * update the search bar list once the input in the seach bar is changed
+     */
     const updateBestMatches = async () => {
         try {
             if (input) {

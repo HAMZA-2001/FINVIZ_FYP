@@ -1,7 +1,5 @@
-
 import './App.css';
 import Header from './Header';
-import App2 from './App2';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from './components/Dashboard';
 import StockContext from './components/StockContext';
@@ -11,14 +9,18 @@ import AuthenticationPage from './Authentication/AuthenticationPage';
 import { useState } from 'react';
 import { AuthProvider } from './Authentication/context/AuthContext';
 import PrivateRoute from './PrivateRoute';
-import UserProfile from './UserProfiling/UserProfile';
 import UserPortfolio from './Portfolio/UserPortfolio';
 import StockPortfolioContext from './Portfolio/StockPortfolioContext';
 import * as userService from './Portfolio/constants/UserForm/userService'
 import PortfolioSummary from './PortfolioTracker/PortfolioSummary';
-import App3 from './App3';
 import MachineLearningModel from './MachineLearning/MachineLearningModel';
 import AnalysisPage from './Analysis/AnalysisPage';
+import VisualizationPage from './MainVisualization/VisualizationPage';
+
+/**
+ * core of the website
+ * @returns skeleton of the application
+ */
 function App() {
   const [stockSymbol, setStockSymbol] = useState("FB")
    const [portfoliostockSymbol, setportfoliostockSymbol] = useState("")
@@ -32,25 +34,19 @@ function App() {
 
           <Route path='/signup' element={
           <div>
-            {/* <AuthProvider> */}
-              <Signup/>
-            {/* </AuthProvider> */}
-            
+              <Signup/>  
           </div>}/>
 
           <Route path='/login' element={
           <div>
-            {/* <AuthProvider> */}
-              <Login/>
-            {/* </AuthProvider> */}
-            
+              <Login/>   
           </div>}/>
 
           <Route path="/viz" element={
             <PrivateRoute>
             <div className='app__header'>
             <Header/>
-            <App3/>
+            <VisualizationPage/>
           </div>
           </PrivateRoute>
           }/> 
